@@ -2,6 +2,7 @@ from get_GFED4s_CO_emissions import COEmissions;
 from bokeh.plotting import figure, output_file, show
 import numpy as np;
 
+
 start_year = 1997
 end_year = 2014
 
