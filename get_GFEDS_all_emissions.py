@@ -97,11 +97,11 @@ def calculate_emissions():
                     mask = basis_regions == (region + 1)            
                 emissions_table[6, region] = np.sum(grid_area * mask * total_emissions);
             print "\t" + str(year) + " done";
-            # convert to Tg CO 
-            emissions_table = emissions_table / 1E12;
             # convert to $ value
             GRAMS_PER_TON = 907185;
             scar_table = emissions_table * scar_values[species_num] / GRAMS_PER_TON;
+            # convert to Tg CO 
+            emissions_table = emissions_table / 1E12;
             plotter.plot(species_used[species_num], year, "emissions", emissions_table);
             plotter.plot(species_used[species_num], year, "SCAR", scar_table);
             # write
