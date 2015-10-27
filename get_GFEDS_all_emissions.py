@@ -133,7 +133,7 @@ def calculate_emissions():
     #totals for three regionally organized tables
     regional_tables = [[np.zeros((7, 15)), np.zeros((7, 15)), np.zeros((7, 15))]] * 20;
     #totals for three species-organized tables
-    species_tables = [[np.zeros((7, 15)), np.zeros((7, 15)), np.zeros((7, 15))]] * 20;
+    species_tables = [[np.zeros((7, 9)), np.zeros((7, 9)), np.zeros((7, 9))]] * 20;
     for species_num in range(9):
         EF_species = EFs[species_row[species_num]];
         writers = [];
