@@ -42,7 +42,7 @@ def plot_and_write(plotter, writer, result_table, data_type, identifier):
     writer.writerow([]);
 
 def plot(plotter, result_table, data_type, identifier):
-        plotter.plot_regions(identifier, data_type, result_table);
+    plotter.plot_regions(identifier, data_type, result_table);
     
 def get_year_file(directory, year):
     string = directory+'/GFED4.1s_'+str(year)+'.hdf5'
@@ -99,7 +99,7 @@ def plot_and_write_table(emissions_table, writers, plotter, species_num, EF_spec
     final_emissions_table = emissions_table / 1E12;
     tables = [final_emissions_table, scar_table, aq_table];
     for data_type in range(3):
-        plot_and_write(plotter, writers[data_type], tables[data_type], data_types[data_type], species_used[species_num], identifier);
+        plot_and_write(plotter, writers[data_type], tables[data_type], data_types[data_type], identifier);
     print emissions_table
 
 def plot_table(emissions_table, plotter, species_num, EF_species, identifier):
@@ -110,7 +110,7 @@ def plot_table(emissions_table, plotter, species_num, EF_species, identifier):
     final_emissions_table = emissions_table / 1E12;
     tables = [final_emissions_table, scar_table, aq_table];
     for data_type in range(3):
-        plot(plotter, tables[data_type], data_types[data_type], species_used[species_num], identifier);
+        plot(plotter, tables[data_type], data_types[data_type], identifier);
     print emissions_table
 
 def calculate_emissions():
@@ -155,7 +155,7 @@ def calculate_emissions():
         for year in range(start_year, end_year+1):
             emissions_table = calculate_species_for_year(directory, species_num, EF_species, year, 0);
             yearly_totals[year - start_year] += emissions_table;
-            write_table(emissions_table, writers, plotter, species_num, EF_species, species_used[species_num] + str(year));
+            plot_and_write_table(emissions_table, writers, plotter, species_num, EF_species, species_used[species_num] + str(year));
         #do el nino years separately -- calculate and write emissions for July 1997 - June 1998
         el_nino_97_table = calculate_species_for_year(directory, species_num, EF_species, 1997, 7);
         write_species_for_year(el_nino_97_table, writers, plotter, species_num, EF_species, species_used[species_num] + ": 1997 - 1998 El Nino");
@@ -165,8 +165,8 @@ def calculate_emissions():
 
     #calculate total emissions by adding up the results from each species, for each year
     print "plotting totals...";
-    plotter.plot()
-    
+    for yearly_total in yearly_totals:
+        plot_table(yearly_totals[yearly_total], plotter, species_num, EF_species, str(year) + " regional totals");
     
 
 
