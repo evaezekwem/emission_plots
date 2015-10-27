@@ -31,7 +31,7 @@ def sum_regions(result_table, grid_area, emissions_data, basis_regions, source):
         result_table[source, region] = np.sum(grid_area * mask * emissions_data);     
 
 #plots data for a species' impact and writes it to a csv file
-def plot_and_write(plotter, writer, result_table, data_type, species, identifier)
+def plot_and_write(plotter, writer, result_table, data_type, species, identifier):
     plotter.plot(species, identifier, data_type, result_table);
     for source in range(7):
         source_list = result_table[source, :].tolist();
