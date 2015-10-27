@@ -15,8 +15,6 @@ units = ["1E12 g", "2007 US$", "2007 US$"];
 start_year = 1997
 end_year   = 2014
 GRAMS_PER_TON = 907185;
-#basis_regions = None;
-#grid_area = None;
 
 def setup_writer(data_type, species, units):
     writer = csv.writer(open("./plots/tables/" + data_type + "/" + species + '_' + data_type + '.csv', 'w'));
@@ -68,7 +66,7 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
             # read in the fractional contribution of each source
             string = '/emissions/'+months[new_month]+'/partitioning/DM_'+sources[source]
             contribution = f[string][:]
-            if(sources[source] == 'SAVA' && species_used[species_num] == 'CO2'):
+            if(sources[source] == 'SAVA' and species_used[species_num] == 'CO2'):
                 contribution = 0;
             source_emissions += DM_emissions * contribution * EF_species[source];
         # calculate CO emissions as the product of DM emissions (kg DM per 
@@ -106,7 +104,7 @@ def plot_regions_table(emissions_table, plotter, species_num, EF_species, identi
     final_emissions_table = emissions_table / 1E12;
     tables = [final_emissions_table, scar_table, aq_table];
     for data_type in range(3):
-        plotter.plot_regions(identifier, data_type, result_table);
+        plotter.plot_regions(identifier, data_types[data_type], tables[data_type]);
     print emissions_table
 
 def plot_species_table(emissions_table, plotter, species_num, EF_species, identifier):
@@ -117,7 +115,7 @@ def plot_species_table(emissions_table, plotter, species_num, EF_species, identi
     final_emissions_table = emissions_table / 1E12;
     tables = [final_emissions_table, scar_table, aq_table];
     for data_type in range(3):
-        plotter.plot_species(identifier, data_type, result_table);
+        plotter.plot_species(identifier, data_types[data_type], tables[data_type]);
     print emissions_table
 
 def calculate_emissions():
@@ -161,30 +159,24 @@ def calculate_emissions():
             writers.append(setup_writer(data_types[writer_type], species_used[species_num], units[writer_type]));
         #calculate and write emissions for this species for each year 1997 - 2014
         for year in range(start_year, end_year+1):
-<<<<<<< HEAD
             emissions_table = calculate_species_for_year(directory, species_num, EF_species, year, 0);
             regional_totals[year - start_year] += emissions_table;
             species_totals[year - start_year][0:7, species_num] = emissions_table[0:7, 14];
-            plot_and_write_table(emissions_table, writers, plotter, species_num, EF_species, species_used[species_num] + str(year));
+            plot_and_write_table(emissions_table, writers, plotter, species_num, EF_species, species_used[species_num] +"_" +  str(year));
         #do el nino years separately -- calculate and write emissions for July 1997 - June 1998
         el_nino_97_table = calculate_species_for_year(directory, species_num, EF_species, 1997, 7);
-        write_species_for_year(el_nino_97_table, writers, plotter, species_num, EF_species, species_used[species_num] + "1997-1998 El Nino");
+        plot_and_write_table(el_nino_97_table, writers, plotter, species_num, EF_species, species_used[species_num] + "_1997-1998 El Nino");
         la_nina_98_table = calculate_species_for_year(directory, species_num, EF_species, 1998, 7);        
-        write_species_for_year(la_nina_98_table, writers, plotter, species_num, EF_species, species_used[species_num] + "1998-1999 La Nina");
-        write_species_for_year(el_nino_97_table - la_nina_98_table, writers, plotter, species_num, EF_species, species_used[species_num] + "difference between 97-98 El Nino and 98-99 La Nina");
-=======
-            write_species_for_year(directory, writers, plotter, species_num, EF_species, str(year), year, 0);
-        #do el nino year separately -- calculate and write emissions for July 1997 - June 1998
-        write_species_for_year(directory, writers, plotter, species_num, EF_species, "1997 - 1998 El Nino", 1997, 7);
->>>>>>> d6363feb6f8d5c9435536dc8d8790231d11b8ee4
+        plot_and_write_table(la_nina_98_table, writers, plotter, species_num, EF_species, species_used[species_num] + "_1998-1999 La Nina");
+        plot_and_write_table(el_nino_97_table - la_nina_98_table, writers, plotter, species_num, EF_species, species_used[species_num] + "_difference between 97-98 El Nino and 98-99 La Nina");
         print species_used[species_num] + " done";
 
     #calculate total emissions by adding up the results from each species, for each year
     print "plotting totals...";
     for regional_total in regional_totals:
-        plot_regions_table(regional_totals[regional_total], plotter, species_num, EF_species, str(year) + " regional totals");
+        plot_regions_table(regional_total, plotter, species_num, EF_species, str(year) + " regional totals");
     for species_total in species_totals:
-        plot_species_table(species_totals[species_total], plotter, species_num, EF_species, str(year) + " all species");
+        plot_species_table(species_total, plotter, species_num, EF_species, str(year) + " all species");
 
     
 

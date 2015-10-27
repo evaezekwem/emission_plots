@@ -23,11 +23,10 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(plot_width=800, plot_height=800, formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
+        p = Bar(formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
         save(p);
 
     def plot_species(self, identifier, chart, species_table):
-        def plot_regions(self, identifier, chart, species_table):
         TOOLS="resize,crosshair,tap,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,hover";
         species      = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
         sources      = 'TEMF','SAVA','BORF','DEFO','PEAT','AGRI', 'All sources';
@@ -44,6 +43,6 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(plot_width=800, plot_height=800, formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=species_colors, tools=TOOLS);
+        p = Bar(formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=species_colors, tools=TOOLS);
         save(p);
 
