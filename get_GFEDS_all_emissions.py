@@ -138,76 +138,9 @@ def calculate_emissions():
             writers.append(setup_writer(data_types[writer_type], species_used[species], units[writer_type]));
         #calculate and write emissions for this species for each year 1997 - 2014
         for year in range(start_year, end_year+1):
-<<<<<<< HEAD
             write_species_for_year(directory, writers, species_num, EF_species, str(year), year, 0);
         #do el nino year separately -- calculate and write emissions for July 1997 - June 1998
         write_species_for_year(directory, writers, species_num, EF_species, "1997 - 1998 El Nino", 1997, 7);
-=======
-            emissions_table = np.zeros((7, 15)) # source, region
-            source_emissions = np.zeros(7);
-            emissions_writer.writerow([year]);
-            emissions_writer.writerow([""] + regions);
-            scar_writer.writerow([year]);
-            scar_writer.writerow([""] + regions);
-        
-            string = directory+'/GFED4.1s_'+str(year)+'.hdf5'
-            f = h5py.File(string, 'r')
-            if year == start_year: # these are time invariable    
-                basis_regions = f['/ancill/basis_regions'][:]
-                grid_area     = f['/ancill/grid_cell_area'][:]
-            
-            total_emissions = np.zeros((720, 1440));
-            for source in range(6):
-                source_emissions = np.zeros((720, 1440))
-                for month in range(12):
-                    # read in DM emissions
-                    string = '/emissions/'+months[month]+'/DM'
-                    DM_emissions = f[string][:]
-                    # read in the fractional contribution of each source
-                    string = '/emissions/'+months[month]+'/partitioning/DM_'+sources[source]
-                    contribution = f[string][:]
-                    source_emissions += DM_emissions * contribution * EF_species[source];
-                # calculate CO emissions as the product of DM emissions (kg DM per 
-                    # m2 per month), the fraction the specific source contributes to 
-                    # this (unitless), and the emission factor (g CO per kg DM burned)
-                total_emissions += source_emissions;
-                for region in range(15):
-                    if region == 14:
-                        mask = np.ones((720, 1440))
-                    else:
-                        mask = basis_regions == (region + 1)            
-                    emissions_table[source, region] = np.sum(grid_area * mask * source_emissions);
-
-
-            
-            # fill table with total values for the globe (row 15) or basisregion (1-14)
-            for region in range(15):
-                if region == 14:
-                    mask = np.ones((720, 1440))
-                else:
-                    mask = basis_regions == (region + 1)            
-                emissions_table[6, region] = np.sum(grid_area * mask * total_emissions);
-            print "\t" + str(year) + " done";
-            # convert to $ value
-            GRAMS_PER_TON = 907185;
-            scar_table = emissions_table * scar_values[species_num] / GRAMS_PER_TON;
-            # convert to Tg CO 
-            emissions_table = emissions_table / 1E12;
-            plotter.plot(species_used[species_num], year, "emissions", emissions_table);
-            plotter.plot(species_used[species_num], year, "SCAR", scar_table);
-            # write
-            for source in range(7):
-                emissions_source_list = emissions_table[source, :].tolist();
-                scar_source_list = scar_table[source, :].tolist();
-                emissions_source_list.insert(0, sources[source]);
-                scar_source_list.insert(0, sources[source]);
-                emissions_writer.writerow(emissions_source_list);
-                scar_writer.writerow(scar_source_list);
-                #writer.writerow([sources[source]] + emissions_table[source, :].tolist());
-            emissions_writer.writerow([]);
-            scar_writer.writerow([]);
-            print emissions_table
->>>>>>> 66f13e58ac8398e21b83cc1cd7fab2ce43daca71
         print species_used[species_num] + " done";
     
     
