@@ -13,7 +13,7 @@ class Plotter:
         
         without_global = species_table[0:7, 0:14];
         formatted_data = pandas.DataFrame(data=without_global, index=sources, columns=regions);
-        formatted_data.reindex(['TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources']);
+        formatted_data = formatted_data.reindex(['TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources']);
 
         chart_title = chart + " - " + identifier;
         y_label = "Social Cost (2007 US $)";
@@ -32,7 +32,7 @@ class Plotter:
 
         formatted_data = pandas.DataFrame(data=species_table, index=sources, columns=species);
         col_list = list(formatted_data);
-        formatted_data.reindex(['TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources']);
+        formatted_data = formatted_data.reindex(['TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources']);
 
         chart_title = chart + " - " + identifier;
         y_label = "Social Cost (2007 US $)";
