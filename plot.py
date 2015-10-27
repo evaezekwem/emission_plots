@@ -23,6 +23,27 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
+        p = Bar(plot_width=800, plot_height=800, formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
+        save(p);
+
+    def plot_species(self, identifier, chart, species_table):
+        def plot_regions(self, identifier, chart, species_table):
+        TOOLS="resize,crosshair,tap,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,hover";
+        species      = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
+        sources      = 'TEMF','SAVA','BORF','DEFO','PEAT','AGRI', 'All sources';
+        species_colors = ["#660033", "#FF0066", "#FFCC99", "#CCCC00", "#333300", "#00FF00", "#009999", "#66FFFF", "#000099"];
+
+        formatted_data = pandas.DataFrame(data=species_table, index=sources, columns=species);
+        col_list = list(formatted_data);
+        col_list[0], col_list[1], col_list[2] = col_list[2], col_list[1], col_list[0];
+        formatted_data.columns = col_list;
+
+        chart_title = chart + " - " + identifier;
+        y_label = "Social Cost (2007 US $)";
+        if(chart == "emissions"):
+            y_label = "Total emissions (1E12 g)";
+        output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
+        
+        p = Bar(plot_width=800, plot_height=800, formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=species_colors, tools=TOOLS);
         save(p);
 
