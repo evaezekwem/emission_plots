@@ -57,7 +57,7 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
         source_emissions = np.zeros((720, 1440))
         for month in range(12):
             #since we're not always doing january-december, may have to load a new year
-            if(month == 12):
+            if(month+start_month == 12):
                 f = get_year_file(directory, year+1);
             new_month = (month+start_month) % 12;
             # read in DM emissions
@@ -131,15 +131,9 @@ def calculate_emissions():
 
     plotter = Plotter();
     #totals for three regionally organized tables
-    regional_totals = np.zeros((7, 15));
-    regional_SCAR_totals = np.zeros((7, 15));
-    regional_AQ_totals = np.zeros((7, 15));
-    regional_tables = [[regional_totals, regional_SCAR_totals, regional_AQ_totals]] * 20;
+    regional_tables = [[np.zeros((7, 15)), np.zeros((7, 15)), np.zeros((7, 15))]] * 20;
     #totals for three species-organized tables
-    species_totals = np.zeros((7, 9));
-    species_SCAR_totals = np.zeros((7, 9));
-    species_AQ_totals = np.zeros((7, 9));
-    species_tables = [[species_totals, species_SCAR_totals, species_AQ_totals]] * 20;
+    species_tables = [[np.zeros((7, 15)), np.zeros((7, 15)), np.zeros((7, 15))]] * 20;
     for species_num in range(9):
         EF_species = EFs[species_row[species_num]];
         writers = [];
@@ -181,9 +175,9 @@ def calculate_emissions():
     #calculate total emissions by adding up the results from each species, for each year
     for year in range(20):
         year_description = str(start_year+year);
-        if(year == end_year+1):
+        if(year + start_year == end_year+1):
             year_description = "1997-1998 El Nino";
-        if(year == end_year+2):
+        if(year + start_year == end_year+2):
             year_description = "1998-1999 La Nina";
         plot_regions_table(regional_tables[year], plotter, year_description + " regional totals");
         plot_species_table(species_tables[year], plotter, year_description + " all species");
