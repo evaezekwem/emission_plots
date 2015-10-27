@@ -8,7 +8,7 @@ class Plotter:
     def plot_regions(self, identifier, chart, species_table):
         TOOLS="resize,crosshair,tap,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,hover";
         regions      = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
-        sources      = 'TEMF','SAVA','BORF','DEFO','PEAT','AGRI', 'All sources';
+        sources      = 'TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources';
         region_colors = ["#660033", "#FF0066", "#FFCC99", "#CCCC00", "#333300", "#00FF00", "#009999", "#66FFFF", "#000099", "#6600CC", "#CC7A00", "#FF9999", "#FFFF00", "#522900", "#006600"];
         
         without_global = species_table[0:7, 0:14];
