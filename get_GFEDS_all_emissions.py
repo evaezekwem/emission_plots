@@ -15,8 +15,8 @@ units = ["1E12 g", "2007 US$", "2007 US$"];
 start_year = 1997
 end_year   = 2014
 GRAMS_PER_TON = 907185;
-basis_regions;
-grid_area;
+basis_regions = None;
+grid_area = None;
 
 def setup_writer(data_type, species, units):
     writer = csv.writer(open("./plots/tables/" + data_type + "/" + species + '_' + data_type + '.csv', 'w'));
@@ -51,6 +51,9 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
     emissions_table = np.zeros((7, 15)) # source, region
     source_emissions = np.zeros(7);
     f = get_year_file(directory, year);
+    if year == start_year: # these are time invariable    
+        basis_regions = f['/ancill/basis_regions'][:]
+        grid_area     = f['/ancill/grid_cell_area'][:]
     
     total_emissions = np.zeros((720, 1440));
     for source in range(6):
@@ -137,9 +140,6 @@ def calculate_emissions():
             writers.append(setup_writer(data_types[writer_type], species_used[species_num], units[writer_type]));
         #calculate and write emissions for this species for each year 1997 - 2014
         for year in range(start_year, end_year+1):
-            if year == start_year: # these are time invariable    
-                basis_regions = f['/ancill/basis_regions'][:]
-                grid_area     = f['/ancill/grid_cell_area'][:]
             write_species_for_year(directory, writers, species_num, EF_species, str(year), year, 0);
         #do el nino year separately -- calculate and write emissions for July 1997 - June 1998
         write_species_for_year(directory, writers, plotter, species_num, EF_species, "1997 - 1998 El Nino", 1997, 7);
