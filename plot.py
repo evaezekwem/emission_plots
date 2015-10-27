@@ -21,7 +21,7 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
+        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
         save(p);
 
     def plot_species(self, identifier, chart, species_table):
@@ -40,6 +40,6 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=species_colors, tools=TOOLS);
+        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=species_colors, tools=TOOLS);
         save(p);
 
