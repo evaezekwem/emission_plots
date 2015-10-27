@@ -5,7 +5,7 @@ import pandas;
 
 class Plotter:
     
-    def plot(self, species, identifier, chart, species_table):
+    def plot_regions(self, identifier, chart, species_table):
         TOOLS="resize,crosshair,tap,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,hover";
         regions      = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
         sources      = 'TEMF','SAVA','BORF','DEFO','PEAT','AGRI', 'All sources';
@@ -17,11 +17,12 @@ class Plotter:
         col_list[0], col_list[1], col_list[2] = col_list[2], col_list[1], col_list[0];
         formatted_data.columns = col_list;
 
-        chart_title = "" + species + " " + chart + " - " + identifier;
+        chart_title = chart + " - " + identifier;
         y_label = "Social Cost (2007 US $)";
         if(chart == "emissions"):
             y_label = "Total emissions (1E12 g)";
-        output_file("plots/tables/" + chart + "/plots/" + species + "_" + identifier + "_" + chart + "_visualization.html", title = chart_title);
+        output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
         p = Bar(formatted_data, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
         save(p);
+
