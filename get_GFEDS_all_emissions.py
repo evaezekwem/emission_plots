@@ -86,17 +86,17 @@ def plot_and_write_table(tables, writers, plotter, identifier):
         writers[data_type].writerow([identifier]);
         writers[data_type].writerow([""] + regions);
         plot_and_write(plotter, writers[data_type], tables[data_type], data_types[data_type], identifier);
-    print tables[0]
+    #print tables[0]
 
 def plot_regions_table(regions_tables, plotter, identifier):
     for data_type in range(3):
         plotter.plot_regions(identifier, data_types[data_type], regions_tables[data_type]);
-    print regions_tables[0]
+    #print regions_tables[0]
 
 def plot_species_table(species_tables, plotter, identifier):
     for data_type in range(3):
         plotter.plot_species(identifier, data_types[data_type], species_tables[data_type]);
-    print species_tables[0]
+    #print species_tables[0]
 
 def calculate_emissions():
     
@@ -131,9 +131,9 @@ def calculate_emissions():
 
     plotter = Plotter();
     #totals for three regionally organized tables
-    regional_tables = [[np.zeros((7, 15)), np.zeros((7, 15)), np.zeros((7, 15))]] * 20;
+    regional_tables = np.zeros((20, 3, 7, 15));
     #totals for three species-organized tables
-    species_tables = [[np.zeros((7, 9)), np.zeros((7, 9)), np.zeros((7, 9))]] * 20;
+    species_tables = np.zeros((20, 3, 7, 9));
     for species_num in range(9):
         EF_species = EFs[species_row[species_num]];
         writers = [];
@@ -165,13 +165,10 @@ def calculate_emissions():
             for data_type in range(3):
                 regional_tables[year - start_year][data_type] += tables[data_type];
                 species_tables[year - start_year][data_type][0:7, species_num] = tables[data_type][0:7, 14];
-
-            for writer in writers:
-                writer.writerow([identifier]);
-                writer.writerow([""] + regions);
+                print species_tables[year - start_year][data_type];
+            
             plot_and_write_table(tables, writers, plotter, identifier);
         print species_used[species_num] + " done";
-
     #calculate total emissions by adding up the results from each species, for each year
     for year in range(20):
         year_description = str(start_year+year);
@@ -181,7 +178,6 @@ def calculate_emissions():
             year_description = "1998-1999 La Nina";
         plot_regions_table(regional_tables[year], plotter, year_description + " regional totals");
         plot_species_table(species_tables[year], plotter, year_description + " all species");
-
 
     
 
