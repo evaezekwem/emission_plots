@@ -46,6 +46,7 @@ def get_year_file(directory, year):
 
 #calculates information for a species' impact in a year   
 def calculate_species_for_year(directory, species_num, EF_species, year, start_month):
+    print "year: " + str(year);
     emissions_table = np.zeros((7, 15)) # source, region
     source_emissions = np.zeros(7);
     f = get_year_file(directory, year);
@@ -56,9 +57,14 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
     for source in range(6):
         source_emissions = np.zeros((720, 1440))
         for month in range(12):
+            print "month: " + str(month);
             #since we're not always doing january-december, may have to load a new year
             if(month+start_month == 12):
+                print "switched year";
                 f = get_year_file(directory, year+1);
+                basis_regions = f['/ancill/basis_regions'][:]
+                grid_area     = f['/ancill/grid_cell_area'][:]
+
             new_month = (month+start_month) % 12;
             # read in DM emissions
             string = '/emissions/'+months[new_month]+'/DM'
@@ -77,7 +83,6 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
     
     # fill table with total values for the globe (row 15) or basisregion (1-14)
     sum_regions(emissions_table, grid_area, total_emissions, basis_regions, 6);
-    print "\t" + str(year) + " done";
     return emissions_table;   
 
 #post-processes the data calculated for a species impact in a year and writes to all the different data files      
@@ -135,6 +140,8 @@ def calculate_emissions():
     #totals for three species-organized tables
     species_tables = np.zeros((20, 3, 7, 9));
     for species_num in range(9):
+        print " "
+        print "Species: " + species_used[species_num]
         EF_species = EFs[species_row[species_num]];
         writers = [];
         for writer_type in range(3):
@@ -165,7 +172,6 @@ def calculate_emissions():
             for data_type in range(3):
                 regional_tables[year - start_year][data_type] += tables[data_type];
                 species_tables[year - start_year][data_type][0:7, species_num] = tables[data_type][0:7, 14];
-                print species_tables[year - start_year][data_type];
             
             plot_and_write_table(tables, writers, plotter, identifier);
         print species_used[species_num] + " done";
