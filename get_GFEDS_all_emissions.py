@@ -28,7 +28,7 @@ def sum_regions(result_table, grid_area, emissions_data, basis_regions, source):
             mask = np.ones((720, 1440))
         else:
             mask = basis_regions == (region + 1)            
-        result_table[source, region] = np.sum(grid_area * mask * emissions_data);     
+        result_table[source, region] += np.sum(grid_area * mask * emissions_data);     
 
 #plots data for a species' impact and writes it to a csv file
 def plot_and_write(plotter, writer, result_table, data_type, identifier):
@@ -48,7 +48,6 @@ def get_year_file(directory, year):
 def calculate_species_for_year(directory, species_num, EF_species, year, start_month):
     print "year: " + str(year);
     emissions_table = np.zeros((7, 15)) # source, region
-    source_emissions = np.zeros(7);
     f = get_year_file(directory, year);
     basis_regions = f['/ancill/basis_regions'][:]
     grid_area     = f['/ancill/grid_cell_area'][:]
@@ -64,6 +63,8 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
                 f = get_year_file(directory, year+1);
                 basis_regions = f['/ancill/basis_regions'][:]
                 grid_area     = f['/ancill/grid_cell_area'][:]
+                sum_regions(emissions_table, grid_area, source_emissions, basis_regions, source);
+                source_emissions = np.zeros((720, 1440))
 
             new_month = (month+start_month) % 12;
             # read in DM emissions
