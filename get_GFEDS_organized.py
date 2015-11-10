@@ -22,11 +22,11 @@ NUM_SPECIES = 9;
 NUM_REGIONS = 15;
 
 def read_emissions_factors(directory):
-	"""
+    """
     Read in emission factors
     """
     EFs     = np.zeros((41, 6)) # 41 species, 6 sources
-
+    
     k = 0
     f = open(directory+'/GFED4_Emission_Factors.txt')
     while 1:
@@ -40,52 +40,52 @@ def read_emissions_factors(directory):
             k += 1
                     
     f.close()
-	return EFs;
+    return EFs;
 
 def load_data(directory, EFs):
-	# 18 years, 12 months, 6 sources, 9 species, 14 regions
-	emissions_data = np.zeros((NUM_YEARS, NUM_MONTHS, NUM_SOURCES, NUM_SPECIES, NUM_REGIONS));
-	
-	# 9 species
-	for year in range(start_year, end_year):
-		print "year: " + str(year);
+    # 18 years, 12 months, 6 sources, 9 species, 14 regions
+    emissions_data = np.zeros((NUM_YEARS, NUM_MONTHS, NUM_SOURCES, NUM_SPECIES, NUM_REGIONS));
+    
+    # 9 species
+    for year in range(start_year, end_year):
+        print "year: " + str(year);
 
-    	f = get_year_file(directory, year);
-    	basis_regions = f['/ancill/basis_regions'][:]
-    	grid_area     = f['/ancill/grid_cell_area'][:]
-		
-		for month in range(NUM_MONTHS):
-			print "month: " + str(month);
-	        # read in DM emissions
+        f = get_year_file(directory, year);
+        basis_regions = f['/ancill/basis_regions'][:]
+        grid_area     = f['/ancill/grid_cell_area'][:]
+        
+        for month in range(NUM_MONTHS):
+            print "month: " + str(month);
+            # read in DM emissions
             string = '/emissions/'+months[month]+'/DM'
             DM_emissions = f[string][:]
-			
-			for source in range(NUM_SOURCES):
-				# read in the fractional contribution of each source
-            	string = '/emissions/'+months[month]+'/partitioning/DM_'+sources[source]
-            	contribution = f[string][:]
-			
-				for species_num in range(NUM_SPECIES):
-					print " "
-					print "Species: " + species_used[species_num]
-					
-					if(sources[source] == 'SAVA' and species_used[species_num] == 'CO2'):
-						contribution = 0;
-					
-					source_emissions = np.zeros((720, 1440))
-					EF_species = EFs[species_row[species_num]];
-					
-					source_emissions = DM_emissions * contribution * EF_species[source];
-					
-					for region in range(NUM_REGIONS):
+            
+            for source in range(NUM_SOURCES):
+                # read in the fractional contribution of each source
+                string = '/emissions/'+months[month]+'/partitioning/DM_'+sources[source]
+                contribution = f[string][:]
+            
+                for species_num in range(NUM_SPECIES):
+                    print " "
+                    print "Species: " + species_used[species_num]
+                    
+                    if(sources[source] == 'SAVA' and species_used[species_num] == 'CO2'):
+                        contribution = 0;
+                    
+                    source_emissions = np.zeros((720, 1440))
+                    EF_species = EFs[species_row[species_num]];
+                    
+                    source_emissions = DM_emissions * contribution * EF_species[source];
+                    
+                    for region in range(NUM_REGIONS):
                         #global
-        				if region == NUM_REGIONS - 1:
-            				mask = np.ones((720, 1440))
-       					else:
-            				mask = basis_regions == (region + 1) 
-						emissions_data[year - start_year, month, source, species_num, region] = np.sum(grid_area * mask * emissions_data);
-						
-	return emissions_data;
+                        if region == NUM_REGIONS - 1:
+                            mask = np.ones((720, 1440))
+                        else:
+                            mask = basis_regions == (region + 1) 
+                        emissions_data[year - start_year, month, source, species_num, region] = np.sum(grid_area * mask * emissions_data);
+                        
+    return emissions_data;
     
 def finalize_and_plot(table, plotter_method, year_label):
     # convert to $ value
@@ -147,10 +147,10 @@ def plot_all_years(emissions_data, plot_method):
     # ENSO years -- july to june
     plot_method(1997, 7, "97-98_El_Nino");
     plot_method(1997, 7, "98-99_La_Nina");
-        	
+            
 def plot_data(emissions_data):
-	plotter = Plotter();
-	
+    plotter = Plotter();
+    
     # each species for each year
     #for year in range(18):
     #    for species_num in range(9):
@@ -164,7 +164,7 @@ def plot_data(emissions_data):
     plot_all_years(emissions_data, plot_all_regions_for_year);
     
     # time series
-		
+        
 
 def calculate_emissions():
     
@@ -175,14 +175,14 @@ def calculate_emissions():
     # to your computer and adjust the directory where you placed them below
     directory    = '.'
 
-	EFs = read_emissions_factors(directory);
-	
-	print "loading...";
-	emissions_data = load_data(directory, EFs);
-	
-	print "";
-	print "plotting...";
-	plot_data(emissions_data);
+    EFs = read_emissions_factors(directory);
+    
+    print "loading...";
+    emissions_data = load_data(directory, EFs);
+    
+    print "";
+    print "plotting...";
+    plot_data(emissions_data);
 
     
 
