@@ -64,6 +64,7 @@ def calculate_species_for_year(directory, species_num, EF_species, year, start_m
                 basis_regions = f['/ancill/basis_regions'][:]
                 grid_area     = f['/ancill/grid_cell_area'][:]
                 sum_regions(emissions_table, grid_area, source_emissions, basis_regions, source);
+                total_emissions += source_emissions;
                 source_emissions = np.zeros((720, 1440))
 
             new_month = (month+start_month) % 12;
