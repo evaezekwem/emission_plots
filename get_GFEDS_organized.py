@@ -72,12 +72,15 @@ def load_data(directory, EFs):
                 # read in the fractional contribution of each source
                 string = '/emissions/'+months[month]+'/partitioning/DM_'+sources[source]
                 contribution = f[string][:]
-            
+                saved_contribution = contribution;
+
                 for species_num in range(NUM_SPECIES):
                     print "Species: " + species_used[species_num]
                     
                     if(sources[source] == 'SAVA' and species_used[species_num] == 'CO2'):
                         contribution = 0;
+                    else:
+                        contribution = saved_contribution;
                     
                     source_emissions = np.zeros((720, 1440))
                     EF_species = EFs[species_row[species_num]];
@@ -109,18 +112,19 @@ def process_emissions(value, species_num):
     
 def plot_all_species_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
     this_year = year;
-    #species -> source (+ all sources)
+    #source (+ all sources) -> species
     all_species_chart = np.zeros((NUM_SOURCES + 1, NUM_SPECIES));
     for species_num in range(NUM_SPECIES):
         totaled_sources = 0;
         for source in range (NUM_SOURCES):
             totaled_source = 0;
-            for region in range(NUM_REGIONS):
+            #exclude global region
+            for region in range(NUM_REGIONS - 1):
                 for month in range(NUM_MONTHS):
                     this_month = month
                     # dealing with when we start partway through a year -- such as for ENSO
                     if(month + start_month > NUM_MONTHS):
-                        this_month = month % NUM_MONTHS;
+                        this_month = ((month + start_month) % NUM_MONTHS) - 1;
                         this_year = year + 1;
                     totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], species_num);
             all_species_chart[source, species_num] = totaled_source;
@@ -131,18 +135,19 @@ def plot_all_species_for_year(plotter, metric, process_method, emissions_data, y
     
 def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
     this_year = year;
-    #species -> source (+ all sources)
-    all_regions_chart = np.zeros((NUM_SOURCES + 1, NUM_REGIONS));
-    for region in range(NUM_REGIONS):
+    #source (+ all sources) -> regions (except global)
+    all_regions_chart = np.zeros((NUM_SOURCES + 1, NUM_REGIONS - 1));
+    #exclude global region
+    for region in range(NUM_REGIONS - 1):
         totaled_sources = 0;
         for source in range (NUM_SOURCES):
             totaled_source = 0;
             for species_num in range(NUM_SPECIES):
                 for month in range(NUM_MONTHS):
-                    this_month = month
+                    this_month = month;
                     # dealing with when we start partway through a year -- such as for ENSO
                     if(month + start_month > NUM_MONTHS):
-                        this_month = month % NUM_MONTHS;
+                        this_month = ((month + start_month) % NUM_MONTHS) - 1;
                         this_year = year + 1;
                     totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], species_num);
             all_regions_chart[source, region] = totaled_source;
