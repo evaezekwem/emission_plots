@@ -12,7 +12,7 @@ class Plotter:
     
     def plot_regions_total(self, identifier, chart, species_table):
         without_global = species_table[0:7, 0:14];
-        formatted_data = pandas.DataFrame(data=without_global, index=sources, columns=regions);
+        formatted_data = pandas.DataFrame(data=without_global, index=self.sources, columns=self.regions);
         formatted_data = formatted_data.reindex(['TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources']);
 
         chart_title = chart + " - " + identifier;
@@ -21,11 +21,11 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=region_colors, tools=TOOLS);
+        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
         save(p);
 
     def plot_species_total(self, identifier, chart, species_table):
-        formatted_data = pandas.DataFrame(data=species_table, index=sources, columns=species);
+        formatted_data = pandas.DataFrame(data=species_table, index=self.sources, columns=self.species);
         col_list = list(formatted_data);
         formatted_data = formatted_data.reindex(['TEMF','BORF','SAVA','DEFO','PEAT','AGRI', 'All sources']);
 
@@ -35,6 +35,6 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=species_colors, tools=TOOLS);
+        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
         save(p);
 
