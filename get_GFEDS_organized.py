@@ -42,31 +42,38 @@ def read_emissions_factors(directory):
     f.close()
     return EFs;
 
+def get_year_file(directory, year):
+    string = directory+'/GFED4.1s_'+str(year)+'.hdf5'
+    f = h5py.File(string, 'r')
+    return f
+
 def load_data(directory, EFs):
     # 18 years, 12 months, 6 sources, 9 species, 14 regions
     emissions_data = np.zeros((NUM_YEARS, NUM_MONTHS, NUM_SOURCES, NUM_SPECIES, NUM_REGIONS));
     
     # 9 species
     for year in range(start_year, end_year):
-        print "year: " + str(year);
+        print " ";
+        print "Year: " + str(year);
 
         f = get_year_file(directory, year);
         basis_regions = f['/ancill/basis_regions'][:]
         grid_area     = f['/ancill/grid_cell_area'][:]
         
         for month in range(NUM_MONTHS):
-            print "month: " + str(month);
+            print " ";
+            print "Month: " + str(month);
             # read in DM emissions
             string = '/emissions/'+months[month]+'/DM'
             DM_emissions = f[string][:]
             
             for source in range(NUM_SOURCES):
+                print "Source: " + sources[source];
                 # read in the fractional contribution of each source
                 string = '/emissions/'+months[month]+'/partitioning/DM_'+sources[source]
                 contribution = f[string][:]
             
                 for species_num in range(NUM_SPECIES):
-                    print " "
                     print "Species: " + species_used[species_num]
                     
                     if(sources[source] == 'SAVA' and species_used[species_num] == 'CO2'):
@@ -83,7 +90,9 @@ def load_data(directory, EFs):
                             mask = np.ones((720, 1440))
                         else:
                             mask = basis_regions == (region + 1) 
-                        emissions_data[year - start_year, month, source, species_num, region] = np.sum(grid_area * mask * emissions_data);
+                        emissions_data[year - start_year, month, source, species_num, region] = np.sum(grid_area * mask * source_emissions);
+        print " ";
+        print "YEAR " + str(year) + " COMPLETE";
                         
     return emissions_data;
     
@@ -93,14 +102,14 @@ def finalize_and_plot(table, plotter_method, year_label):
     aq_table = table * aq_values[species_num] / GRAMS_PER_TON;
     # convert to Tg CO 
     emissions_table = table / 1E12;
-    plot_species_total(plotter, year_label + "_all_species", "SCAR", scar_table);
-    plot_species_total(plotter, year_label + "_all_species", "air_quality", aq_table);
-    plot_species_total(plotter, year_label + "_all_species", "emissions", emissions_table);
+    plotter_method(plotter, year_label + "_all_species", "SCAR", scar_table);
+    plotter_method(plotter, year_label + "_all_species", "air_quality", aq_table);
+    plotter_method(plotter, year_label + "_all_species", "emissions", emissions_table);
     
-def plot_all_species_for_year(start_year, start_month, year_label):
+def plot_all_species_for_year(plotter, emissions_data, start_year, start_month, year_label):
     this_year = start_year;
     #species -> source (+ all sources)
-    all_species_chart = np.zeros(NUM_SPECIES, NUM_SOURCES + 1);
+    all_species_chart = np.zeros((NUM_SPECIES, NUM_SOURCES + 1));
     for species_num in range(NUM_SPECIES):
         totaled_sources = 0;
         for source in range (NUM_SOURCES):
@@ -119,10 +128,10 @@ def plot_all_species_for_year(start_year, start_month, year_label):
         
     finalize_and_plot(all_species_chart, plotter.plot_species_total, year_label);
     
-def plot_all_regions_for_year(start_year, start_month, year_label):
+def plot_all_regions_for_year(plotter, emissions_data, start_year, start_month, year_label):
     this_year = start_year;
     #species -> source (+ all sources)
-    all_regions_chart = np.zeros(NUM_REGIONS, NUM_SOURCES + 1);
+    all_regions_chart = np.zeros((NUM_REGIONS, NUM_SOURCES + 1));
     for region in range(NUM_REGIONS):
         totaled_sources = 0;
         for source in range (NUM_SOURCES):
@@ -140,13 +149,13 @@ def plot_all_regions_for_year(start_year, start_month, year_label):
         all_regions_chart[species_num, NUM_SOURCES] = totaled_sources;
     finalize_and_plot(all_regions_chart, plotter.plot_regions_total, year_label);
     
-def plot_all_years(emissions_data, plot_method):
+def plot_all_years(plotter, emissions_data, plot_method):
     # each calendar year
     for year in range(NUM_YEARS):
-        plot_method(year, 0, year+start_year);
+        plot_method(plotter, emissions_data, year, 0, year+start_year);
     # ENSO years -- july to june
-    plot_method(1997, 7, "97-98_El_Nino");
-    plot_method(1997, 7, "98-99_La_Nina");
+    plot_method(plotter, emissions_data, 1997, 7, "97-98_El_Nino");
+    plot_method(plotter, emissions_data, 1997, 7, "98-99_La_Nina");
             
 def plot_data(emissions_data):
     plotter = Plotter();
@@ -158,10 +167,10 @@ def plot_data(emissions_data):
     #        plotter.plot_species() 
     
     # total for all species for each year
-    plot_all_years(emissions_data, plot_all_species_for_year);
+    plot_all_years(plotter, emissions_data, plot_all_species_for_year);
     
     # total for all regions for each year
-    plot_all_years(emissions_data, plot_all_regions_for_year);
+    plot_all_years(plotter, emissions_data, plot_all_regions_for_year);
     
     # time series
         
