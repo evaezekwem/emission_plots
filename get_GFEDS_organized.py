@@ -95,18 +95,19 @@ def load_data(directory, EFs):
         print "YEAR " + str(year) + " COMPLETE";
                         
     return emissions_data;
+
+# convert to $ value  
+def process_scar(value, species_num):
+    return value * scar_values[species_num] / GRAMS_PER_TON;
     
-def finalize_and_plot(table, plotter_method, year_label):
-    # convert to $ value
-    scar_table = table * scar_values[species_num] / GRAMS_PER_TON;
-    aq_table = table * aq_values[species_num] / GRAMS_PER_TON;
-    # convert to Tg CO 
+def process_aq(value, species_num):
+    return value * aq_values[species_num] / GRAMS_PER_TON;
+
+# convert to Tg CO  
+def process_emissions(value, species_num):
     emissions_table = table / 1E12;
-    plotter_method(plotter, year_label + "_all_species", "SCAR", scar_table);
-    plotter_method(plotter, year_label + "_all_species", "air_quality", aq_table);
-    plotter_method(plotter, year_label + "_all_species", "emissions", emissions_table);
     
-def plot_all_species_for_year(plotter, emissions_data, start_year, start_month, year_label):
+def plot_all_species_for_year(plotter, metric, process_method, emissions_data, start_year, start_month, year_label):
     this_year = start_year;
     #species -> source (+ all sources)
     all_species_chart = np.zeros((NUM_SPECIES, NUM_SOURCES + 1));
@@ -121,14 +122,14 @@ def plot_all_species_for_year(plotter, emissions_data, start_year, start_month, 
                     if(month + start_month > NUM_MONTHS):
                         this_month = month % NUM_MONTHS;
                         this_year = start_year + 1;
-                    totaled_source += emissions_data[this_year, this_month, source, species_num, region];
+                    totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], species_num);
             all_species_chart[species_num, source] = totaled_source;
             totaled_sources += totaled_source;
         all_species_chart[species_num, NUM_SOURCES] = totaled_sources;
         
-    finalize_and_plot(all_species_chart, plotter.plot_species_total, year_label);
+    plotter.plot_species_total(plotter, year_label + "_all_species", metric, all_species_chart);
     
-def plot_all_regions_for_year(plotter, emissions_data, start_year, start_month, year_label):
+def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, start_year, start_month, year_label):
     this_year = start_year;
     #species -> source (+ all sources)
     all_regions_chart = np.zeros((NUM_REGIONS, NUM_SOURCES + 1));
@@ -143,19 +144,26 @@ def plot_all_regions_for_year(plotter, emissions_data, start_year, start_month, 
                     if(month + start_month > NUM_MONTHS):
                         this_month = month % NUM_MONTHS;
                         this_year = start_year + 1;
-                    totaled_source += emissions_data[this_year, this_month, source, species_num, region];
+                    totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], species_num);
             all_regions_chart[species_num, source] = totaled_source;
             totaled_sources += totaled_source;
         all_regions_chart[species_num, NUM_SOURCES] = totaled_sources;
-    finalize_and_plot(all_regions_chart, plotter.plot_regions_total, year_label);
+        
+    plotter.plot_regions_total(plotter, year_label + "_all_regions", metric, all_regions_chart);
     
 def plot_all_years(plotter, emissions_data, plot_method):
     # each calendar year
     for year in range(NUM_YEARS):
-        plot_method(plotter, emissions_data, year, 0, year+start_year);
+        plot_method(plotter, "emissions", process_emissions, emissions_data, year, 0, year+start_year);
+        plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, year+start_year);
+        plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, year+start_year);
     # ENSO years -- july to june
-    plot_method(plotter, emissions_data, 1997, 7, "97-98_El_Nino");
-    plot_method(plotter, emissions_data, 1997, 7, "98-99_La_Nina");
+    plot_method(plotter, "emissions", process_emissions, emissions_data, 1997, 7, "97-98_El_Nino");
+    plot_method(plotter, "SCAR", process_scar, emissions_data, 1997, 7, "97-98_El_Nino");
+    plot_method(plotter, "air_quality", process_aq, emissions_data, 1997, 7, "97-98_El_Nino");
+    plot_method(plotter, "emissions", process_emissions, emissions_data, 1997, 7, "98-99_La_Nina");
+    plot_method(plotter, "SCAR", process_scar, emissions_data, 1997, 7, "98-99_La_Nina");
+    plot_method(plotter, "air_quality", process_aq, emissions_data, 1997, 7, "98-99_La_Nina");
             
 def plot_data(emissions_data):
     plotter = Plotter();
