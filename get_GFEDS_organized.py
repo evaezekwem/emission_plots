@@ -78,6 +78,7 @@ def load_data(directory, EFs):
 					source_emissions = DM_emissions * contribution * EF_species[source];
 					
 					for region in range(NUM_REGIONS):
+                        #global
         				if region == NUM_REGIONS - 1:
             				mask = np.ones((720, 1440))
        					else:
@@ -86,30 +87,66 @@ def load_data(directory, EFs):
 						
 	return emissions_data;
     
-def plot_all_species(emissions_data):
-    # total for all species for each year
-    for year in range(NUM_YEARS):
-        #species -> source (+ all sources)
-        all_species_chart = np.zeros(NUM_SPECIES, NUM_SOURCES + 1);
-        for species_num in range(NUM_SPECIES):
-            totaled_sources = 0;
-            for source in range (NUM_SOURCES):
-                totaled_source = 0;
-                for region in range(NUM_REGIONS):
-                    for month in range(NUM_MONTHS):
-                        totaled_source += emissions_data[year, month, source, species_num, region];
-                all_species_chart[species_num, source] = totaled_source;
-                totaled_sources += totaled_source;
-            all_species_chart[species_num, NUM_SOURCES] = totaled_sources;
+def finalize_and_plot(table, plotter_method, year_label):
+    # convert to $ value
+    scar_table = table * scar_values[species_num] / GRAMS_PER_TON;
+    aq_table = table * aq_values[species_num] / GRAMS_PER_TON;
+    # convert to Tg CO 
+    emissions_table = table / 1E12;
+    plot_species_total(plotter, year_label + "_all_species", "SCAR", scar_table);
+    plot_species_total(plotter, year_label + "_all_species", "air_quality", aq_table);
+    plot_species_total(plotter, year_label + "_all_species", "emissions", emissions_table);
+    
+def plot_all_species_for_year(start_year, start_month, year_label):
+    this_year = start_year;
+    #species -> source (+ all sources)
+    all_species_chart = np.zeros(NUM_SPECIES, NUM_SOURCES + 1);
+    for species_num in range(NUM_SPECIES):
+        totaled_sources = 0;
+        for source in range (NUM_SOURCES):
+            totaled_source = 0;
+            for region in range(NUM_REGIONS):
+                for month in range(NUM_MONTHS):
+                    this_month = month
+                    # dealing with when we start partway through a year -- such as for ENSO
+                    if(month + start_month > NUM_MONTHS):
+                        this_month = month % NUM_MONTHS;
+                        this_year = start_year + 1;
+                    totaled_source += emissions_data[this_year, this_month, source, species_num, region];
+            all_species_chart[species_num, source] = totaled_source;
+            totaled_sources += totaled_source;
+        all_species_chart[species_num, NUM_SOURCES] = totaled_sources;
         
-        # convert to $ value
-        scar_table = all_species_chart * scar_values[species_num] / GRAMS_PER_TON;
-        aq_table = all_species_chart * aq_values[species_num] / GRAMS_PER_TON;
-        # convert to Tg CO 
-        emissions_table = all_species_chart / 1E12;
-        plotter.plot_species_total(plotter, str(year + start_year) + "_all_species", "SCAR", scar_table);
-        plotter.plot_species_total(plotter, str(year + start_year) + "_all_species", "air_quality", aq_table);
-        plotter.plot_species_total(plotter, str(year + start_year) + "_all_species", "emissions", emissions_table);
+    finalize_and_plot(all_species_chart, plotter.plot_species_total, year_label);
+    
+def plot_all_regions_for_year(start_year, start_month, year_label):
+    this_year = start_year;
+    #species -> source (+ all sources)
+    all_regions_chart = np.zeros(NUM_REGIONS, NUM_SOURCES + 1);
+    for region in range(NUM_REGIONS):
+        totaled_sources = 0;
+        for source in range (NUM_SOURCES):
+            totaled_source = 0;
+            for species_num in range(NUM_SPECIES):
+                for month in range(NUM_MONTHS):
+                    this_month = month
+                    # dealing with when we start partway through a year -- such as for ENSO
+                    if(month + start_month > NUM_MONTHS):
+                        this_month = month % NUM_MONTHS;
+                        this_year = start_year + 1;
+                    totaled_source += emissions_data[this_year, this_month, source, species_num, region];
+            all_regions_chart[species_num, source] = totaled_source;
+            totaled_sources += totaled_source;
+        all_regions_chart[species_num, NUM_SOURCES] = totaled_sources;
+    finalize_and_plot(all_regions_chart, plotter.plot_regions_total, year_label);
+    
+def plot_all_years(emissions_data, plot_method):
+    # each calendar year
+    for year in range(NUM_YEARS):
+        plot_method(year, 0, year+start_year);
+    # ENSO years -- july to june
+    plot_method(1997, 7, "97-98_El_Nino");
+    plot_method(1997, 7, "98-99_La_Nina");
         	
 def plot_data(emissions_data):
 	plotter = Plotter();
@@ -118,18 +155,13 @@ def plot_data(emissions_data):
     #for year in range(18):
     #    for species_num in range(9):
             
-    #        plotter.plot_species()
-         
+    #        plotter.plot_species() 
     
     # total for all species for each year
-    plot_all_species(emissions_data);
-            
-    # el nino / la nina -- all species
-            
+    plot_all_years(emissions_data, plot_all_species_for_year);
     
     # total for all regions for each year
-    
-    # el nino / la nina -- all regions
+    plot_all_years(emissions_data, plot_all_regions_for_year);
     
     # time series
 		
