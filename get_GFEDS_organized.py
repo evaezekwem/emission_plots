@@ -132,6 +132,7 @@ def plot_all_species_for_year(plotter, metric, process_method, emissions_data, y
         all_species_chart[NUM_SOURCES, species_num] = totaled_sources;
         
     plotter.plot_species_total(year_label + "_all_species", metric, all_species_chart);
+    return all_species_chart;
     
 def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
     this_year = year;
@@ -155,13 +156,21 @@ def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, y
         all_regions_chart[NUM_SOURCES, region] = totaled_sources;
         
     plotter.plot_regions_total(year_label + "_all_regions", metric, all_regions_chart);
+    return all_regions_chart;
     
 def plot_all_years(plotter, emissions_data, plot_method):
+    emissions_time_series = [];
+    scar_time_series = [];
+    air_quality_time_series = [];
     # each calendar year
     for year in range(NUM_YEARS):
-        plot_method(plotter, "emissions", process_emissions, emissions_data, year, 0, str(year+start_year));
-        plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year));
-        plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year));
+        emissions_time_series.append(plotter.format_table(plot_method(plotter, "emissions", process_emissions, emissions_data, year, 0, str(year+start_year))));
+        scar_time_series.append(plotter.format_table(plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year))));
+        air_quality_time_series.append(plotter.format_table(plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year))));
+    plotter.plot_time_series(np.concatenate(emissions_time_series, 1));
+    plotter.plot_time_series(np.concatenate(scar_time_series, 1));
+    plotter.plot_time_series(np.concatenate(air_quality_time_series, 1));
+    
     #ENSO years -- july to june
     plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
     plot_method(plotter, "SCAR", process_scar, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
