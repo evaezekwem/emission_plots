@@ -30,30 +30,30 @@ class Plotter:
         formatted_data = formatted_data.reindex(time_series_reindexed);
         return formatted_data;
         
-    def plot(self, identifier, chart, data):
+    def plot(self, identifier, chart, data, width):
         chart_title = chart + " - " + identifier;
         y_label = "Social Cost (2007 US $)";
         if(chart == "emissions"):
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
+        p = Bar(data, width=width, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
         save(p);
     
     def plot_regions_total(self, identifier, chart, regions_table):
         formatted_data = self.format_table(regions_table, self.regions);
-        self.plot(identifier, chart, formatted_data);
+        self.plot(identifier, chart, formatted_data, 900);
 
     def plot_species_total(self, identifier, chart, species_table):
         formatted_data = self.format_table(species_table, self.species);
-        self.plot(identifier, chart, formatted_data);
+        self.plot(identifier, chart, formatted_data, 900);
 
     def plot_regions_time_series(self, identifier, chart, time_series):
         formatted_data = self.format_time_series(time_series, self.regions);
-        self.plot(identifier, chart, formatted_data);
+        self.plot(identifier, chart, formatted_data, 16000);
     
     def plot_species_time_series(self, identifier, chart, time_series):
         formatted_data = self.format_time_series(time_series, self.species);
-        self.plot(identifier, chart, formatted_data);
+        self.plot(identifier, chart, formatted_data, 16000);
         
 
