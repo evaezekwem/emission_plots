@@ -26,7 +26,7 @@ class Plotter:
             for source in range(self.NUM_SOURCES + 1):
                 time_series_sources.append(str(year+self.start_year) + " " + self.sources[source]);
                 time_series_reindexed.append(str(year+self.start_year) + " " + self.reindexed_sources[source]);
-        formatted_data = pandas.DataFrame(data=table, index=time_series_sources, columns=column);
+        formatted_data = pandas.DataFrame(data=time_series, index=time_series_sources, columns=column);
         formatted_data = formatted_data.reindex(time_series_reindexed);
         return formatted_data;
         
@@ -37,23 +37,23 @@ class Plotter:
             y_label = "Total emissions (1E12 g)";
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_" + chart + "_visualization.html", title = chart_title);
         
-        p = Bar(formatted_data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
+        p = Bar(data, width=900, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
         save(p);
     
     def plot_regions_total(self, identifier, chart, regions_table):
-        formatted_data = self.format_table(self, regions_table, self.regions);
-        plot(identifier, chart, formatted_data);
+        formatted_data = self.format_table(regions_table, self.regions);
+        self.plot(identifier, chart, formatted_data);
 
     def plot_species_total(self, identifier, chart, species_table):
-        formatted_data = self.format_table(self, species_table, self.species);
-        plot(identifier, chart, formatted_data);
+        formatted_data = self.format_table(species_table, self.species);
+        self.plot(identifier, chart, formatted_data);
 
     def plot_regions_time_series(self, identifier, chart, time_series):
-        formatted_data = self.format_time_series(self, time_series, self.regions);
-        plot(identifier, chart, formatted_data);
+        formatted_data = self.format_time_series(time_series, self.regions);
+        self.plot(identifier, chart, formatted_data);
     
     def plot_species_time_series(self, identifier, chart, time_series):
-        formatted_data = self.format_time_series(self, time_series, self.species);
-        plot(identifier, chart, formatted_data);
+        formatted_data = self.format_time_series(time_series, self.species);
+        self.plot(identifier, chart, formatted_data);
         
 
