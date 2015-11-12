@@ -52,7 +52,7 @@ def load_data(directory, EFs):
     emissions_data = np.zeros((NUM_YEARS, NUM_MONTHS, NUM_SOURCES, NUM_SPECIES, NUM_REGIONS));
     
     # 9 species
-    for year in range(start_year, end_year):
+    for year in range(start_year, end_year + 1):
         print " ";
         print "Year: " + str(year);
 
