@@ -158,7 +158,7 @@ def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, y
     plotter.plot_regions_total(year_label + "_all_regions", metric, all_regions_chart);
     return all_regions_chart;
     
-def plot_all_years(plotter, emissions_data, plot_method, time_series_method):
+def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series_method):
     emissions_time_series = [];
     scar_time_series = [];
     air_quality_time_series = [];
@@ -167,9 +167,9 @@ def plot_all_years(plotter, emissions_data, plot_method, time_series_method):
         emissions_time_series.append(plot_method(plotter, "emissions", process_emissions, emissions_data, year, 0, str(year+start_year)));
         scar_time_series.append(plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year)));
         air_quality_time_series.append(plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year)));
-    time_series_method("emissions_time_series", "emissions", np.concatenate(emissions_time_series, 0));
-    time_series_method("SCAR_time_series", "SCAR", np.concatenate(scar_time_series, 0));
-    time_series_method("air_quality_time_series", "air_quality", np.concatenate(air_quality_time_series, 0));
+    time_series_method(identifier + "_emissions_time_series", "emissions", np.concatenate(emissions_time_series, 0));
+    time_series_method(identifier + "_SCAR_time_series", "SCAR", np.concatenate(scar_time_series, 0));
+    time_series_method(identifier + "_air_quality_time_series", "air_quality", np.concatenate(air_quality_time_series, 0));
     
     #ENSO years -- july to june
     plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
@@ -189,10 +189,10 @@ def plot_data(emissions_data):
     #        plotter.plot_species() 
     
     # total for all species for each year
-    plot_all_years(plotter, emissions_data, plot_all_species_for_year, plotter.plot_species_time_series);
+    plot_all_years(plotter, "species", emissions_data, plot_all_species_for_year, plotter.plot_species_time_series);
     
     # total for all regions for each year
-    plot_all_years(plotter, emissions_data, plot_all_regions_for_year, plotter.plot_regions_time_series);
+    plot_all_years(plotter, "regions", emissions_data, plot_all_regions_for_year, plotter.plot_regions_time_series);
     
     # time series
         
