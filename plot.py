@@ -30,6 +30,13 @@ class Plotter:
         formatted_data = formatted_data.reindex(time_series_reindexed);
         return formatted_data;
         
+    def format_source_time_series(self, time_series, column):
+        time_series_sources = [];
+        for year in range(self.NUM_YEARS):
+            time_series_sources.append(str(year+self.start_year));
+        formatted_data = pandas.DataFrame(data=time_series, index=time_series_sources, columns=column);
+        return formatted_data;        
+        
     def plot(self, identifier, chart, data, width):
         chart_title = chart + " - " + identifier;
         y_label = "Social Cost (2007 US $)";
@@ -50,10 +57,14 @@ class Plotter:
 
     def plot_regions_time_series(self, identifier, chart, time_series):
         formatted_data = self.format_time_series(time_series, self.regions);
-        self.plot(identifier, chart, formatted_data, 16000);
+        self.plot(identifier, chart, formatted_data, 12000);
     
     def plot_species_time_series(self, identifier, chart, time_series):
         formatted_data = self.format_time_series(time_series, self.species);
-        self.plot(identifier, chart, formatted_data, 16000);
+        self.plot(identifier, chart, formatted_data, 12000);
+        
+    def plot_regions_source_time_series(self, identifier, chart, time_series):
+        formatted_data = self.format_source_time_series(time_series, self.regions);
+        self.plot(identifier, chart, formatted_data, 4000);
         
 
