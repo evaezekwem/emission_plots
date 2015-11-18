@@ -206,7 +206,7 @@ def plot_time_series_for_sources(plotter, emissions_data, process_method, metric
                     all_years_chart[year, region] = totaled_region;
                     all_sources_all_years_chart[year,region] += totaled_region;
             plotter.plot_regions_source_time_series(sources[source] + "_per_ton_carbon", metric, all_years_chart);
-    plotter.plot_regions_source_time_series(sources[source] + "_per_ton_carbon", metric, all_sources_all_years_chart);
+    plotter.plot_regions_source_time_series("All_sources_per_ton_carbon", metric, all_sources_all_years_chart);
             #return all_years_chart;
 
             
