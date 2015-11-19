@@ -111,8 +111,6 @@ def process_emissions(value, species_num):
     return value / 1E12;
     
 def process_scar_per_ton(value, species_num, carbon_value):
-    print species_used[species_num] + " value " + str(value);
-    print species_used[0] + " value " + str(carbon_value);
     tons_carbon = carbon_value / GRAMS_PER_TON;
     return value * scar_values[species_num] / GRAMS_PER_TON / tons_carbon;
     
@@ -197,14 +195,15 @@ def plot_time_series_for_sources(plotter, emissions_data, process_method, metric
             for year in range(NUM_YEARS):
                 for region in range(NUM_REGIONS - 1):
                     totaled_region = 0;
+                    totaled_carbon = 0;
                     #tons_of_carbon = 0;
                     for species_num in range(NUM_SPECIES):
                         for month in range(NUM_MONTHS):
-                            carbon_value = emissions_data[year, month, source, 0, region];
-                            if(carbon_value > 0):
-                                totaled_region += process_method(emissions_data[year, month, source, species_num, region], species_num, carbon_value);
-                    all_years_chart[year, region] = totaled_region;
-                    all_sources_all_years_chart[year,region] += totaled_region;
+                            totaled_carbon += emissions_data[year, month, source, 0, region] / GRAMS_PER_TON;
+                            totaled_region += process_method(emissions_data[year, month, source, species_num, region], species_num);
+                    if(totaled_carbon > 0):
+                        all_years_chart[year, region] = totaled_region / totaled_carbon;
+                    #all_sources_all_years_chart[year,region] += totaled_region;
             plotter.plot_regions_source_time_series(sources[source] + "_per_ton_carbon", metric, all_years_chart);
     plotter.plot_regions_source_time_series("All_sources_per_ton_carbon", metric, all_sources_all_years_chart);
             #return all_years_chart;
@@ -227,8 +226,8 @@ def plot_data(emissions_data):
     #        plotter.plot_species() 
     # time series for each source
     # plot_time_series_for_sources(plotter, emissions_data, process_emissions, "emissions");
-    plot_time_series_for_sources(plotter, emissions_data, process_scar_per_ton, "SCAR");
-    plot_time_series_for_sources(plotter, emissions_data, process_aq_per_ton, "air_quality");
+    plot_time_series_for_sources(plotter, emissions_data, process_scar, "SCAR");
+    plot_time_series_for_sources(plotter, emissions_data, process_aq, "air_quality");
         
 
 def calculate_emissions():
