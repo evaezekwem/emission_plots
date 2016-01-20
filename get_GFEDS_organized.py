@@ -101,10 +101,11 @@ def load_data(directory, EFs):
 
 # convert to $ value  
 def process_scar(value, species_num):
-    return value * scar_values[species_num] / GRAMS_PER_TON;
+    aq_overcompensation = (6.6/7.6) * (value *aq_values[species_num] / GRAMS_PER_TON);
+    return (value * scar_values[species_num] / GRAMS_PER_TON) - aq_overcompensation;
     
 def process_aq(value, species_num):
-    return value * aq_values[species_num] / GRAMS_PER_TON;
+    return (1/7.6) * (value * aq_values[species_num] / GRAMS_PER_TON);
 
 # convert to Tg CO  
 def process_emissions(value, species_num):
