@@ -113,11 +113,11 @@ def process_emissions(value, species_num):
     
 def process_scar_per_ton(value, species_num, carbon_value):
     tons_carbon = carbon_value / GRAMS_PER_TON;
-    return value * scar_values[species_num] / GRAMS_PER_TON / tons_carbon;
+    return process_scar(value, species_num) / tons_carbon;
     
 def process_aq_per_ton(value, species_num, carbon_value):
     tons_carbon = carbon_value / GRAMS_PER_TON;
-    return value * aq_values[species_num] / GRAMS_PER_TON / tons_carbon;
+    return process_aq(value, species_num) / tons_carbon;
     
 def plot_all_species_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
     this_year = year;
