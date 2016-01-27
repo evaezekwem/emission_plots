@@ -216,8 +216,7 @@ def write_species(emissions_data, data_type, process_method, species_num, units)
     for year in range(NUM_YEARS):
         writer.writerow([]);
         writer.writerow([start_year+year]);
-        region_header = regions;
-        region_header.insert(0, "");
+        region_header = ['', 'BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST', 'Global'];
         writer.writerow(region_header);
         totaled_regions = ["total", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for source in range(NUM_SOURCES):
