@@ -209,6 +209,37 @@ def plot_time_series_for_sources(plotter, emissions_data, process_method, metric
     plotter.plot_regions_source_time_series("All_sources_per_ton_carbon", metric, all_sources_all_years_chart);
             #return all_years_chart;
 
+def write_species(emissions_data, data_type, process_method, species_num, units):
+    writer = csv.writer(open("./plots/tables/" + data_type + "/" + species_num + ".csv", "w"));
+    writer.writerow(["units - " + units]);
+    writer.writerow([species]);
+    for year in range(NUM_YEARS):
+        writer.writerow([]);
+        writer.writerow([start_year+year]);
+        region_header = regions;
+        region_header.insert(0, "");
+        writer.writerow(region_header);
+        totaled_regions = ["total", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for source in range(NUM_SOURCES):
+            region_list = [sources[source], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            totaled_source = 0;
+            for region in range(NUM_REGIONS - 1):
+                totaled_region = 0;
+                for month in range(NUM_MONTHS):
+                    totaled_region += process_method(emissions_data[year, month, source, species_num, region], species_num);
+                region_list[region+1] = totaled_region;
+                totaled_regions[region+1] = totaled_region;
+                totaled_source += totaled_region;
+            region_list[NUM_REGIONS+1] = totaled_source;
+            totaled_regions[NUM_REGIONS+1] += totaled_source;
+            writer.writerow(region_list);
+        writer.writerow(totaled_regions);
+        
+def write_data(emissions_data):
+    for species in range(NUM_SPECIES):
+        write_species(emissions_data, "air_quality", process_aq, species, "2007 US$");
+        write_species(emissions_data, "emissions", process_emissions, species, "1E12 g");
+        write_species(emissions_data, "SCAR", process_scar, species, "2007 US$");
             
 def plot_data(emissions_data):
     plotter = Plotter();
@@ -229,6 +260,7 @@ def plot_data(emissions_data):
     # plot_time_series_for_sources(plotter, emissions_data, process_emissions, "emissions");
     plot_time_series_for_sources(plotter, emissions_data, process_scar, "SCAR");
     plot_time_series_for_sources(plotter, emissions_data, process_aq, "air_quality");
+   
         
 
 def calculate_emissions():
@@ -248,9 +280,7 @@ def calculate_emissions():
     print "";
     print "plotting...";
     plot_data(emissions_data);
-
-    
-
+    write_data(emissions_data);
 
 # please compare this to http://www.falw.vu/~gwerf/GFED/GFED4/tables/GFED4.1s_CO.txt
 if __name__ == '__main__':
