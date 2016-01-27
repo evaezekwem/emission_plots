@@ -210,9 +210,9 @@ def plot_time_series_for_sources(plotter, emissions_data, process_method, metric
             #return all_years_chart;
 
 def write_species(emissions_data, data_type, process_method, species_num, units):
-    writer = csv.writer(open("./plots/tables/" + data_type + "/" + species_num + ".csv", "w"));
+    writer = csv.writer(open("./plots/tables/" + data_type + "/" + species_used[species_num] + ".csv", "w"));
     writer.writerow(["units - " + units]);
-    writer.writerow([species]);
+    writer.writerow([species_used[species_num]]);
     for year in range(NUM_YEARS):
         writer.writerow([]);
         writer.writerow([start_year+year]);
@@ -230,8 +230,8 @@ def write_species(emissions_data, data_type, process_method, species_num, units)
                 region_list[region+1] = totaled_region;
                 totaled_regions[region+1] = totaled_region;
                 totaled_source += totaled_region;
-            region_list[NUM_REGIONS+1] = totaled_source;
-            totaled_regions[NUM_REGIONS+1] += totaled_source;
+            region_list[NUM_REGIONS] = totaled_source;
+            totaled_regions[NUM_REGIONS] += totaled_source;
             writer.writerow(region_list);
         writer.writerow(totaled_regions);
         
