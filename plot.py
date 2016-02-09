@@ -50,17 +50,18 @@ class Plotter:
     
     def plot_heatmap(self, identifier, chart, average_table):
         chart_title = chart + " Heatmap";
-        formatted_data = None;
+        removed_total = np.delete(average_table, NUM_SOURCES, 0);
+        formatted_data = None
         if(identifier == "regions"):
-            formatted_data = pandas.DataFrame(data=average_table, index=self.sources, columns=self.regions);
+            formatted_data = pandas.DataFrame(data=removed_total, index=self.sources, columns=self.regions);
         if(identifier == "species"):
-            formatted_data = pandas.DataFrame(data=average_table, index=self.sources, columns=self.species);
+            formatted_data = pandas.DataFrame(data=removed_total, index=self.sources, columns=self.species);
         y_label = identifier;
         palette = red_palette[::-1]  # Reverse the color order so dark red is highest
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_heatmap.html", title = chart_title)
         
-        p = HeatMap(formatted_data, width=900, height=900, title=chart_title, xlabel="Source", ylabel=y_label, palette=palette, tools=self.TOOLS);
- 	save(p);
+        p = HeatMap(formatted_data, width=900, height=900, title=chart_title, xlabel="Source", ylabel=y_label, palette=palette);
+ 	    save(p);
    
     def plot_regions_total(self, identifier, chart, regions_table):
         formatted_data = self.format_table(regions_table, self.regions);
