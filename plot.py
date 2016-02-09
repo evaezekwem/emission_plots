@@ -60,7 +60,8 @@ class Plotter:
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_heatmap.html", title = chart_title)
         
         p = HeatMap(formatted_data, width=900, height=900, title=chart_title, xlabel="Source", ylabel=y_label, palette=palette, tools=self.TOOLS);
-    
+ 	save(p);
+   
     def plot_regions_total(self, identifier, chart, regions_table):
         formatted_data = self.format_table(regions_table, self.regions);
         self.plot(identifier, chart, formatted_data, 900);
