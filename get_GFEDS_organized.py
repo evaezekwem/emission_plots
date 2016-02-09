@@ -77,7 +77,7 @@ def load_data(directory, EFs):
                 for species_num in range(NUM_SPECIES):
                     print "Species: " + species_used[species_num]
                     
-                    if(sources[source] == 'SAVA' and species_used[species_num] == 'CO2'):
+                    if((sources[source] == 'SAVA' or sources[source] == 'AGRI') and species_used[species_num] == 'CO2'):
                         contribution = 0;
                     else:
                         contribution = saved_contribution;
@@ -171,14 +171,17 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
     emissions_time_series = [];
     scar_time_series = [];
     air_quality_time_series = [];
-    # each calendar year
+    # each calendar year -- append to a time series array
     for year in range(NUM_YEARS):
         emissions_time_series.append(plot_method(plotter, "emissions", process_emissions, emissions_data, year, 0, str(year+start_year)));
         scar_time_series.append(plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year)));
         air_quality_time_series.append(plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year)));
-    time_series_method(identifier + "_emissions_time_series", "emissions", np.concatenate(emissions_time_series, 0));
-    time_series_method(identifier + "_SCAR_time_series", "SCAR", np.concatenate(scar_time_series, 0));
-    time_series_method(identifier + "_air_quality_time_series", "air_quality", np.concatenate(air_quality_time_series, 0));
+    plotter.plot_heatmap(plotter, identifier, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
+    plotter.plot_heatmap(plotter, identifier, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
+    plotter.plot_heatmap(plotter, identifier, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
+    time_series_method(identifier + "_emissions_time_series", "emissions", emissions_time_series);
+    time_series_method(identifier + "_SCAR_time_series", "SCAR", scar_time_series);
+    time_series_method(identifier + "_air_quality_time_series", "air_quality", air_quality_time_series);
     
     #ENSO years -- july to june
     plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
@@ -188,6 +191,7 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
     plot_method(plotter, "SCAR", process_scar, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
     plot_method(plotter, "air_quality", process_aq, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
     
+# per ton carbon
 def plot_time_series_for_sources(plotter, emissions_data, process_method, metric):
     all_sources_all_years_chart = np.zeros((NUM_YEARS, NUM_REGIONS - 1));
     for source in range (NUM_SOURCES):
