@@ -176,12 +176,12 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
         emissions_time_series.append(plot_method(plotter, "emissions", process_emissions, emissions_data, year, 0, str(year+start_year)));
         scar_time_series.append(plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year)));
         air_quality_time_series.append(plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year)));
-    plotter.plot_heatmap(plotter, identifier, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(plotter, identifier, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(plotter, identifier, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
-    time_series_method(identifier + "_emissions_time_series", "emissions", emissions_time_series);
-    time_series_method(identifier + "_SCAR_time_series", "SCAR", scar_time_series);
-    time_series_method(identifier + "_air_quality_time_series", "air_quality", air_quality_time_series);
+    plotter.plot_heatmap(identifier, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
+    plotter.plot_heatmap(identifier, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
+    plotter.plot_heatmap(identifier, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
+    time_series_method(identifier + "_emissions_time_series", "emissions", np.concatenate(emissions_time_series, axis=0));
+    time_series_method(identifier + "_SCAR_time_series", "SCAR", np.concatenate(scar_time_series, axis=0));
+    time_series_method(identifier + "_air_quality_time_series", "air_quality", np.concatenate(air_quality_time_series, axis=0));
     
     #ENSO years -- july to june
     plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
