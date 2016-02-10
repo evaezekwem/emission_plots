@@ -177,9 +177,9 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
         scar_time_series.append(plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year)));
         air_quality_time_series.append(plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year)));
     # heatmaps for the difference between 98-99 and 97-98
-    plotter.plot_heatmap(identifier + "_ENSO", "emissions", np.subtract(emissions_time_series[1], emissions_time_series[0]));
-    plotter.plot_heatmap(identifier + "_ENSO", "SCAR", np.subtract(scar_time_series[1], scar_time_series[0]));
-    plotter.plot_heatmap(identifier + "_ENSO", "air_quality", np.subtract(air_quality_time_series[1], air_quality_time_series[0]));
+    plotter.plot_heatmap(identifier + "_ENSO", "emissions", emissions_time_series[1] - emissions_time_series[0]);
+    plotter.plot_heatmap(identifier + "_ENSO", "SCAR", scar_time_series[1] - scar_time_series[0]);
+    plotter.plot_heatmap(identifier + "_ENSO", "air_quality", air_quality_time_series[1] - air_quality_time_series[0]);
     # heatmaps for the average of all years
     plotter.plot_heatmap(identifier, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
     plotter.plot_heatmap(identifier, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
