@@ -61,7 +61,7 @@ class Plotter:
         palette = red_palette[::-1]  # Reverse the color order so dark red is highest
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_heatmap.html", title = chart_title)
         
-        p = HeatMap(formatted_data, width=900, height=900, title=chart_title, xlabel="Source", ylabel=y_label, palette=palette);
+        p = HeatMap(formatted_data, width=900, height=900, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", palette=palette);
 	save(p);
    
     def plot_regions_total(self, identifier, chart, regions_table):
