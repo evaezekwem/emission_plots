@@ -10,6 +10,8 @@ species_used = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3']
 species_row  = 2, 4, 13, 14, 3, 12, 8, 7, 33
 scar_values = [84, 4589, 270419, 41968, 632, 68299, 36987, 67141, 24906];
 aq_values = [0, 665, 61701, 33009, 253, 50619, 0, 66854, 22432];
+regional_scaling = [0.09, 3.03, 1.57, 0.37, 0.38, 5.28, 0.28, 1.31, 0.61, 0.45, 7.18, 5.39, 2.36, 0.15];
+global_scaling = 8.53;
 data_types = ["emissions", "SCAR", "AQ"];
 units = ["1E12 g", "2007 US$", "2007 US$"];
 start_year = 1997
@@ -100,15 +102,15 @@ def load_data(directory, EFs):
     return emissions_data;
 
 # convert to $ value  
-def process_scar(value, species_num):
-    aq_overcompensation = (6.6/7.6) * (value *aq_values[species_num] / GRAMS_PER_TON);
+def process_scar(value, region_num, species_num):
+    aq_overcompensation = ((global_scaling-regional_scaling[region_num])/global_scaling) * (value *aq_values[species_num] / GRAMS_PER_TON);
     return (value * scar_values[species_num] / GRAMS_PER_TON) - aq_overcompensation;
     
-def process_aq(value, species_num):
-    return (1/7.6) * (value * aq_values[species_num] / GRAMS_PER_TON);
+def process_aq(value, region_num, species_num):
+    return (regional_scaling[region_num]/global_scaling) * (value * aq_values[species_num] / GRAMS_PER_TON);
 
 # convert to Tg CO  
-def process_emissions(value, species_num):
+def process_emissions(value, region_num, species_num):
     return value / 1E12;
     
 def process_scar_per_ton(value, species_num, carbon_value):
@@ -135,7 +137,7 @@ def plot_all_species_for_year(plotter, metric, process_method, emissions_data, y
                     if(month + start_month > NUM_MONTHS):
                         this_month = ((month + start_month) % NUM_MONTHS) - 1;
                         this_year = year + 1;
-                    totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], species_num);
+                    totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], region, species_num);
             all_species_chart[source, species_num] = totaled_source;
             totaled_sources += totaled_source;
         all_species_chart[NUM_SOURCES, species_num] = totaled_sources;
@@ -159,7 +161,7 @@ def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, y
                     if(month + start_month > NUM_MONTHS):
                         this_month = ((month + start_month) % NUM_MONTHS) - 1;
                         this_year = year + 1;
-                    totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], species_num);
+                    totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], region, species_num);
             all_regions_chart[source, region] = totaled_source;
             totaled_sources += totaled_source;
         all_regions_chart[NUM_SOURCES, region] = totaled_sources;
@@ -177,13 +179,17 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
         scar_time_series.append(plot_method(plotter, "SCAR", process_scar, emissions_data, year, 0, str(year+start_year)));
         air_quality_time_series.append(plot_method(plotter, "air_quality", process_aq, emissions_data, year, 0, str(year+start_year)));
     # heatmaps for the difference between 98-99 and 97-98
-    plotter.plot_heatmap(identifier + "_ENSO", "emissions", emissions_time_series[1] - emissions_time_series[0]);
-    plotter.plot_heatmap(identifier + "_ENSO", "SCAR", scar_time_series[1] - scar_time_series[0]);
-    plotter.plot_heatmap(identifier + "_ENSO", "air_quality", air_quality_time_series[1] - air_quality_time_series[0]);
+    print "diff"
+    print emissions_time_series[1] - emissions_time_series[0]
+    plotter.plot_heatmap(identifier, True,  "emissions", emissions_time_series[1] - emissions_time_series[0]);
+    plotter.plot_heatmap(identifier, True, "SCAR", scar_time_series[1] - scar_time_series[0]);
+    plotter.plot_heatmap(identifier, True, "air_quality", air_quality_time_series[1] - air_quality_time_series[0]);
     # heatmaps for the average of all years
-    plotter.plot_heatmap(identifier, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(identifier, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(identifier, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
+    print "avg"
+    print np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS);
+    plotter.plot_heatmap(identifier, False, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
+    plotter.plot_heatmap(identifier, False, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
+    plotter.plot_heatmap(identifier, False, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
     # time series that show all years in one chart
     time_series_method(identifier + "_emissions_time_series", "emissions", np.concatenate(emissions_time_series, axis=0));
     time_series_method(identifier + "_SCAR_time_series", "SCAR", np.concatenate(scar_time_series, axis=0));
@@ -211,7 +217,7 @@ def plot_time_series_for_sources(plotter, emissions_data, process_method, metric
                     for species_num in range(NUM_SPECIES):
                         for month in range(NUM_MONTHS):
                             totaled_carbon += emissions_data[year, month, source, 0, region] / GRAMS_PER_TON;
-                            totaled_region += process_method(emissions_data[year, month, source, species_num, region], species_num);
+                            totaled_region += process_method(emissions_data[year, month, source, species_num, region], region, species_num);
                     if(totaled_carbon > 0):
                         all_years_chart[year, region] = totaled_region / totaled_carbon;
                     #all_sources_all_years_chart[year,region] += totaled_region;
@@ -235,7 +241,7 @@ def write_species(emissions_data, data_type, process_method, species_num, units)
             for region in range(NUM_REGIONS - 1):
                 totaled_region = 0;
                 for month in range(NUM_MONTHS):
-                    totaled_region += process_method(emissions_data[year, month, source, species_num, region], species_num);
+                    totaled_region += process_method(emissions_data[year, month, source, species_num, region], region, species_num);
                 region_list[region+1] = totaled_region;
                 totaled_regions[region+1] = totaled_region;
                 totaled_source += totaled_region;

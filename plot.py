@@ -1,6 +1,7 @@
 from bokeh.charts import HeatMap, Bar, output_file, show
 from bokeh.plotting import figure, output_file, save
 from bokeh.palettes import Reds9 as red_palette
+from bokeh.palettes import RdBu11 as red_blue_palette
 import numpy as np;
 import pandas;
 
@@ -49,19 +50,23 @@ class Plotter:
         p = Bar(data, width=width, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
         save(p);
     
-    def plot_heatmap(self, identifier, chart, average_table):
+    def plot_heatmap(self, identifier, enso, chart, average_table):
         chart_title = chart + " Heatmap";
         removed_total = np.delete(average_table, self.NUM_SOURCES, 0);
         formatted_data = None
-        if(identifier == "regions"):
+        if(identifier== "regions"):
             formatted_data = pandas.DataFrame(data=removed_total, index=self.basic_sources, columns=self.regions);
+            width = 1400
         if(identifier == "species"):
             formatted_data = pandas.DataFrame(data=removed_total, index=self.basic_sources, columns=self.species);
-        y_label = identifier;
+	    width = 900
+        x_label = identifier;
         palette = red_palette[::-1]  # Reverse the color order so dark red is highest
+	if(enso):
+	    palette = red_blue_palette;
         output_file("plots/tables/" + chart + "/plots/" + identifier + "_heatmap.html", title = chart_title)
-        
-        p = HeatMap(formatted_data, width=900, height=900, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", palette=palette);
+
+        p = HeatMap(formatted_data, width=900, height=600, title=chart_title, xlabel=x_label, ylabel="Source", palette=palette);
 	save(p);
    
     def plot_regions_total(self, identifier, chart, regions_table):
