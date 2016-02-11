@@ -50,25 +50,36 @@ class Plotter:
         p = Bar(data, width=width, height=700, title=chart_title, xlabel="Source", ylabel=y_label, legend="top_left", stacked=True, palette=self.colors, tools=self.TOOLS);
         save(p);
     
-    def plot_heatmap(self, identifier, enso, chart, average_table):
+    def plot_heatmap(self, identifier, enso, chart, average_table, height, width):
         chart_title = chart + " Heatmap";
         removed_total = np.delete(average_table, self.NUM_SOURCES, 0);
         formatted_data = None
+        height = 600;
+        x_label = identifier;
+        y_label = "Source";
+        filename = identifier;
         if(identifier== "regions"):
             formatted_data = pandas.DataFrame(data=removed_total, index=self.basic_sources, columns=self.regions);
             width = 1400
+            x_label = "Regions";
         if(identifier == "species"):
             formatted_data = pandas.DataFrame(data=removed_total, index=self.basic_sources, columns=self.species);
-	    width = 900
-        x_label = identifier;
+	        width = 900
+            x_label = "Species";
+        if(identifier == "both"):
+            formatted_data = pandas.DataFrame(data=removed_total, index=self.self.species, columns=self.regions);
+            height = 900;
+            width = 1400;
+            x_label = "Regions";
+            y_label = "Species";
+            filename += "_combined";
         palette = red_palette[::-1]  # Reverse the color order so dark red is highest
-	filename = identifier;
-	if(enso):
-	    palette = red_blue_palette;
-	    filename += "_ENSO";
+	    if(enso):
+            palette = red_blue_palette;
+            filename += "_ENSO";
         output_file("plots/tables/" + chart + "/plots/" + filename + "_heatmap.html", title = chart_title)
 
-        p = HeatMap(formatted_data, width=900, height=600, title=chart_title, xlabel=x_label, ylabel="Source", palette=palette);
+        p = HeatMap(formatted_data, width=width, height=height, title=chart_title, xlabel=x_label, ylabel="Source", palette=palette);
 	save(p);
    
     def plot_regions_total(self, identifier, chart, regions_table):
