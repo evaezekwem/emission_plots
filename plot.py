@@ -62,9 +62,11 @@ class Plotter:
 	    width = 900
         x_label = identifier;
         palette = red_palette[::-1]  # Reverse the color order so dark red is highest
+	filename = identifier;
 	if(enso):
 	    palette = red_blue_palette;
-        output_file("plots/tables/" + chart + "/plots/" + identifier + "_heatmap.html", title = chart_title)
+	    filename += "_ENSO";
+        output_file("plots/tables/" + chart + "/plots/" + filename + "_heatmap.html", title = chart_title)
 
         p = HeatMap(formatted_data, width=900, height=600, title=chart_title, xlabel=x_label, ylabel="Source", palette=palette);
 	save(p);
