@@ -1,0 +1,21 @@
+<head>
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+  
+  <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+  <script>
+    var data = [
+        {
+            z: [[1, 20, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
+            x: ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'],
+            y: ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'],
+            type: 'heatmap'
+        }
+    ];
+
+    Plotly.newPlot('myDiv', data);
+  </script>
+</body>
