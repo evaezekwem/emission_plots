@@ -15,10 +15,11 @@ class Plotter:
     colors = ["#660033", "#FF0066", "#FFCC99", "#CCCC00", "#333300", "#00FF00", "#009999", "#66FFFF", "#000099", "#6600CC", "#CC7A00", "#FF9999", "#FFFF00", "#522900", "#006600"];
     NUM_YEARS = 18;
     NUM_SOURCES = 6;
+    NUM_REGIONS = 14;
     start_year = 1997;
     
     def format_table(self, table, column):
-        formatted_data = pandas.DataFrame(data=table, index=self.sources, columns=column);
+        formatted_data = pandas.DataFrame(data=table, index=column, columns=self.sources);
         formatted_data = formatted_data.reindex(self.reindexed_sources);
         return formatted_data;
     
@@ -54,7 +55,9 @@ class Plotter:
         chart_title = chart + " Heatmap";
 	removed_total = average_table
         if(identifier != "both"):
-	    removed_total = np.delete(average_table, self.NUM_SOURCES, 0);
+	    removed_total = np.delete(average_table, self.NUM_SOURCES, 1);
+	if(identifier == "both"):
+	    removed_total = np.delete(average_table, self.NUM_REGIONS, 1);
         formatted_data = None
         height = 900;
         x_label = identifier;
@@ -62,10 +65,11 @@ class Plotter:
         filename = identifier;
         if(identifier== "regions"):
             formatted_data = pandas.DataFrame(data=removed_total, index=self.basic_sources, columns=self.regions);
-            width = 1400
+            height = 600;
+            width = 1400;
             x_label = "Regions";
         if(identifier == "species"):
-            formatted_data = pandas.DataFrame(data=removed_total, index=self.basic_sources, columns=self.species);
+            formatted_data = pandas.DataFrame(data=removed_total, index=self.species, columns=self.basic_sources);
 	    width = 600
             x_label = "Species";
         if(identifier == "both"):

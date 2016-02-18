@@ -124,7 +124,7 @@ def process_aq_per_ton(value, species_num, carbon_value):
 def plot_all_species_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
     this_year = year;
     #source (+ all sources) -> species
-    all_species_chart = np.zeros((NUM_SOURCES + 1, NUM_SPECIES));
+    all_species_chart = np.zeros((NUM_SPECIES, NUM_SOURCES + 1));
     for species_num in range(NUM_SPECIES):
         totaled_sources = 0;
         for source in range (NUM_SOURCES):
@@ -138,9 +138,9 @@ def plot_all_species_for_year(plotter, metric, process_method, emissions_data, y
                         this_month = ((month + start_month) % NUM_MONTHS) - 1;
                         this_year = year + 1;
                     totaled_source += process_method(emissions_data[this_year, this_month, source, species_num, region], region, species_num);
-            all_species_chart[source, species_num] = totaled_source;
+            all_species_chart[species_num, source] = totaled_source;
             totaled_sources += totaled_source;
-        all_species_chart[NUM_SOURCES, species_num] = totaled_sources;
+        all_species_chart[species_num, NUM_SOURCES] = totaled_sources;
         
     plotter.plot_species_total(year_label + "_all_species", metric, all_species_chart);
     return all_species_chart;
@@ -172,11 +172,12 @@ def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, y
 def plot_regions_species_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
     this_year = year;
     #source (+ all sources) -> regions (except global)
-    combined_chart = np.zeros((NUM_SPECIES, NUM_REGIONS - 1));
+    combined_chart = np.zeros((NUM_SPECIES, NUM_REGIONS));
     #exclude global region
-    for region in range(NUM_REGIONS - 1):
-        for species_num in range(NUM_SPECIES):
-            totaled_species = 0;
+    for species_num in range(NUM_SPECIES):
+	totaled_species = 0;
+    	for region in range(NUM_REGIONS-1):
+            totaled_region = 0;
             for source in range (NUM_SOURCES):
                 for month in range(NUM_MONTHS):
                     this_month = month;
@@ -184,8 +185,10 @@ def plot_regions_species_for_year(plotter, metric, process_method, emissions_dat
                     if(month + start_month > NUM_MONTHS):
                         this_month = ((month + start_month) % NUM_MONTHS) - 1;
                         this_year = year + 1;
-                    totaled_species += process_method(emissions_data[this_year, this_month, source, species_num, region], region, species_num);
-            combined_chart[species_num, region] = totaled_species;
+                    totaled_region += process_method(emissions_data[this_year, this_month, source, species_num, region], region, species_num);
+            combined_chart[species_num, region] = totaled_region;
+            totaled_species += totaled_region;
+        combined_chart[species_num, NUM_REGIONS-1] = totaled_species;
         
     #plotter.plot_regions_total(year_label + "_species_regions", metric, all_regions_chart);
     return combined_chart;
@@ -218,8 +221,8 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
     print ENSO_AQ_regions_species;
     plotter.plot_heatmap(identifier, False, "SCAR", ENSO_SCAR_source_species);
     plotter.plot_heatmap(identifier, False, "air_quality", ENSO_AQ_source_species);
-    plotter.plot_heatmap(identifier, False, "SCAR", ENSO_SCAR_regions_species);
-    plotter.plot_heatmap(identifier, False, "air_quality", ENSO_AQ_regions_species);
+    plotter.plot_heatmap("both", False, "SCAR", ENSO_SCAR_regions_species);
+    plotter.plot_heatmap("both", False, "air_quality", ENSO_AQ_regions_species);
     # heatmaps for the average of all years
     print "avg"
     print ("\nAVERAGES\n");
@@ -321,8 +324,8 @@ def plot_data(emissions_data):
     #        plotter.plot_species() 
     # time series for each source
     # plot_time_series_for_sources(plotter, emissions_data, process_emissions, "emissions");
-    plot_time_series_for_sources(plotter, emissions_data, process_scar, "SCAR");
-    plot_time_series_for_sources(plotter, emissions_data, process_aq, "air_quality");
+    #plot_time_series_for_sources(plotter, emissions_data, process_scar, "SCAR");
+    #plot_time_series_for_sources(plotter, emissions_data, process_aq, "air_quality");
    
         
 
