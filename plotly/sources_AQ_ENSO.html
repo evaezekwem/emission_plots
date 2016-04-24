@@ -7,15 +7,74 @@
   
   <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
   <script>
+    var regions = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
+    var species = ['Min&Max', 'CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
+    var sources = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
+    var zValues = 
+        [
+            [0,500],
+            [0, 0, 0, 0, 0, 0],
+            [7.88417519e-01, 2.05093701e-01, 1.41767089e-01, 1.10541324,
+                1.24335358e-01, 4.64119244e-01],
+            [1.39516892e+01, 1.59641809, 1.95738715, 1.05193887e+01,
+                2.21851231e-02, 5.54930228],
+            [9.68292282, 1.87892519, 2.30377239, 4.32899800,
+                1.18686697e-01, 1.58335139],
+            [9.74078466, 1.66267999, 1.41259514, 7.71433519,
+                4.77583707e-01, 3.09460792],
+            [8.10490081e+01, 2.51460184e+01, 3.08318322e+01, 7.81680891e+01,
+                2.73917463, 1.39613156e+01],
+            [0, 0, 0, 0, 0, 0],
+            [1.59340023e+02, 3.11353911, 8.14410080, 5.58936655e+01,
+                6.00948227e-01, 2.49328954e+01],
+            [7.12859915, 3.15733987, 1.19553359, 9.78170781,
+                2.68181805e-01, 5.83730902]
+        ]
+        
+    var spectrum = [
+        [0, '#ffffdd'],
+        [.004, '#ffeda0'],
+        [.01, '#fed976'],
+        [.02, '#feb24c'],
+        [.04, '#fd8d3c'],
+        [.1, '#fc4e2a'],
+        [.2, '#e31a1c'],
+        [.4, '#bd0026'],
+        [1, '#800026']
+    ];
+            
     var data = [
         {
-            z: [[1, 20, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
-            x: ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'],
-            y: ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'],
-            type: 'heatmap'
+            z: zValues,
+            x: sources,
+            y: species,
+            type: 'heatmap',
+            colorscale: spectrum,
+            colorbar: {
+                title: "Billion US$"
+            }
         }
     ];
+    
+    var layout = {
+        title:'Air Quality Cost in El Nino 1997-1998',
+        xaxis: {
+            title: 'Region',
+            side: 'top'
+        },
+        yaxis: {
+            title: 'Species'
+        },
+        width: 530,
+        height: 750,
+        margin: {
+            t: 150,
+            l: 90,
+            pad: 2
+        },
+        pad: 25
+    }
 
-    Plotly.newPlot('myDiv', data);
+    Plotly.newPlot('myDiv', data, layout);
   </script>
 </body>

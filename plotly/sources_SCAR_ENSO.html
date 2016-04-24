@@ -7,15 +7,76 @@
   
   <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
   <script>
+    var regions = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
+    var species = ['Min&Max', 'CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
+    var sources = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
+    var zValues = 
+        [
+            [0, 500],
+            [0.00000000e+00, 4.50050648e+01, 2.24043250e+01, 1.57817909e+02,
+                5.41881609, 0.00000000e+00],
+            [2.41248952e+01, 8.62025941, 2.27691142, 2.38551521e+01,
+                3.21607430, 1.09961909e+01],
+            [2.50688712e+02, 3.91470563e+01, 1.88574722e+01, 1.34628206e+02,
+                3.38434997e-01, 7.77402889e+01],
+            [2.28656522e+01, 5.42493263, 3.89969271, 8.42687552,
+                2.54433632e-01, 3.23600315],
+            [8.29362753e+01, 1.89819811e+01, 6.81367823, 4.80195841e+01,
+                3.49245658, 2.09225495e+01],
+            [2.23048930e+02, 8.62178481e+01, 5.83178919e+01, 1.73391256e+02,
+                6.77088417, 3.27143661e+01],
+            [2.26768997e+01, 5.45657805, 9.58358649e-01, 8.45899073,
+                2.80213856e-01, 1.70573252],
+            [1.62771263e+02, 3.20648106, 8.23333721, 5.67305423e+01,
+                6.11819800e-01, 2.53445226e+01],
+            [1.10723329e+01, 5.57868123, 1.53207456, 1.35443315e+01,
+                3.92823065e-01, 8.31314152]
+        ]
+        
+    var spectrum = [
+        [0, '#ffffdd'],
+        [.004, '#ffeda0'],
+        [.01, '#fed976'],
+        [.02, '#feb24c'],
+        [.04, '#fd8d3c'],
+        [.1, '#fc4e2a'],
+        [.2, '#e31a1c'],
+        [.4, '#bd0026'],
+        [1, '#800026']
+    ];
+            
     var data = [
         {
-            z: [[1, 20, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
-            x: ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'],
-            y: ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'],
-            type: 'heatmap'
+            z: zValues,
+            x: sources,
+            y: species,
+            type: 'heatmap',
+            colorscale: spectrum,
+            colorbar: {
+                title: "Billion US$"
+            }
         }
     ];
+    
+    var layout = {
+        title:'SCAR Cost in El Nino 1997-1998',
+        xaxis: {
+            title: 'Region',
+            side: 'top'
+        },
+        yaxis: {
+            title: 'Species'
+        },
+        width: 530,
+        height: 750,
+        margin: {
+            t: 150,
+            l: 90,
+            pad: 2
+        },
+        pad: 25
+    }
 
-    Plotly.newPlot('myDiv', data);
+    Plotly.newPlot('myDiv', data, layout);
   </script>
 </body>
