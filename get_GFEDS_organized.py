@@ -230,18 +230,18 @@ def plot_all_years(identifier, emissions_data):
     print ("\nAIR QUALITY AVERAGES -- SPECIES AND REGIONS\n");
     print (np.divide(np.sum(aq_regions_species, axis=0), NUM_YEARS));
     # time series that show all years in one chart
-    print ("\nSCAR SPECIES SOURCE TIME SERIES\n");
-    print scar_time_series
-    print ("\nSCAR SPECIES REGIONS TIME SERIES\n");
-    print np.transpose(scar_time_series, (1,0,2));
-    print ("\nSCAR REGIONS SPECIES TIME SERIES\n");
-    print np.transpose(scar_time_series, (1,2,0));
-    print ("\nAIR QUALITY SPECIES SOURCES TIME SERIES\n");
-    print air_quality_time_series;
-    print ("\nAIR QUALITY SPECIES REGIONS TIME SERIES\n");
-    print np.transpose(air_quality_time_series,axis=0, (1,0,2));
-    print ("\nAIR QUALITY REGIONS SPECIES TIME SERIES\n");
-    print np.transpose(air_quality_time_series, (1,2,0));
+    print ("\nSCAR SOURCES\n");
+    print np.transpose(scar_time_series, (2,1,0));
+    print ("\nSCAR REGIONS\n");
+    print np.transpose(scar_regions_species, (2,1,0));
+    print ("\nSCAR SPECIES\n");
+    print np.transpose(scar_regions_species, (1,2,0));
+    print ("\nAIR QUALITY SOURCES\n");
+    print np.transpose(air_quality_time_series, (2,1,0));
+    print ("\nAIR QUALITY REGIONS\n");
+    print np.transpose(aq_regions_species, (2,1,0));
+    print ("\nAIR QUALITY SPECIES\n");
+    print np.transpose(aq_regions_species, (1,2,0));
     
     #ENSO years -- july to june
     #plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
