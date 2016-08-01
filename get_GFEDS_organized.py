@@ -1,6 +1,7 @@
 from plot import Plotter
 import csv
 import numpy as np
+np.set_printoptions(threshold=np.inf)
 import h5py # if this creates an error please make sure you have the h5py library
 
 months       = '01','02','03','04','05','06','07','08','09','10','11','12'
@@ -9,7 +10,7 @@ sources      = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI', 'All sources'];
 species_used = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3']
 species_row  = 2, 4, 13, 14, 3, 12, 8, 7, 33
 scar_values = [84, 4589, 270419, 41968, 632, 68299, 36987, 67141, 24906];
-aq_values = [0, 665, 61701, 33009, 253, 50619, 0, 66854, 22432];
+aq_values = [0, 665, 61701, 33009, 239, 50619, 0, 66854, 22432];
 regional_scaling = [0.09, 3.03, 1.57, 0.37, 0.38, 5.28, 0.28, 1.31, 0.61, 0.45, 7.18, 5.39, 2.36, 0.15];
 global_scaling = 8.53;
 data_types = ["emissions", "SCAR", "AQ"];
@@ -142,7 +143,7 @@ def plot_all_species_for_year(plotter, metric, process_method, emissions_data, y
             totaled_sources += totaled_source;
         all_species_chart[species_num, NUM_SOURCES] = totaled_sources;
         
-    plotter.plot_species_total(year_label + "_all_species", metric, all_species_chart);
+    #plotter.plot_species_total(year_label + "_all_species", metric, all_species_chart);
     return all_species_chart;
     
 def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
@@ -166,7 +167,7 @@ def plot_all_regions_for_year(plotter, metric, process_method, emissions_data, y
             totaled_sources += totaled_source;
         all_regions_chart[region, NUM_SOURCES] = totaled_sources;
         
-    plotter.plot_regions_total(year_label + "_all_regions", metric, all_regions_chart);
+    #plotter.plot_regions_total(year_label + "_all_regions", metric, all_regions_chart);
     return all_regions_chart;
     
 def plot_regions_species_for_year(plotter, metric, process_method, emissions_data, year, start_month, year_label):
@@ -219,10 +220,10 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
     print ENSO_SCAR_regions_species;
     print "ENSO AQ REGIONS SPECIES";
     print ENSO_AQ_regions_species;
-    plotter.plot_heatmap(identifier, False, "SCAR", ENSO_SCAR_source_species);
-    plotter.plot_heatmap(identifier, False, "air_quality", ENSO_AQ_source_species);
-    plotter.plot_heatmap("both", False, "SCAR", ENSO_SCAR_regions_species);
-    plotter.plot_heatmap("both", False, "air_quality", ENSO_AQ_regions_species);
+    #plotter.plot_heatmap(identifier, False, "SCAR", ENSO_SCAR_source_species);
+    #plotter.plot_heatmap(identifier, False, "air_quality", ENSO_AQ_source_species);
+    #plotter.plot_heatmap("both", False, "SCAR", ENSO_SCAR_regions_species);
+    #plotter.plot_heatmap("both", False, "air_quality", ENSO_AQ_regions_species);
     # heatmaps for the average of all years
     print "avg"
     print ("\nAVERAGES\n");
@@ -236,23 +237,35 @@ def plot_all_years(plotter, identifier, emissions_data, plot_method, time_series
     print (np.divide(np.sum(scar_regions_species, axis=0), NUM_YEARS));
     print ("\nAIR QUALITY AVERAGES -- SPECIES AND REGIONS\n");
     print (np.divide(np.sum(aq_regions_species, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(identifier, False, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(identifier, False, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap(identifier, False, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
-    plotter.plot_heatmap("both", False, "SCAR", np.divide(np.sum(scar_regions_species, axis=0), NUM_YEARS));
-    plotter.plot_heatmap("both", False, "air_quality", np.divide(np.sum(aq_regions_species, axis=0), NUM_YEARS));
+    #plotter.plot_heatmap(identifier, False, "emissions", np.divide(np.sum(emissions_time_series, axis=0), NUM_YEARS));
+    #plotter.plot_heatmap(identifier, False, "SCAR", np.divide(np.sum(scar_time_series, axis=0), NUM_YEARS));
+    #plotter.plot_heatmap(identifier, False, "air_quality", np.divide(np.sum(air_quality_time_series, axis=0), NUM_YEARS));
+    #plotter.plot_heatmap("both", False, "SCAR", np.divide(np.sum(scar_regions_species, axis=0), NUM_YEARS));
+    #plotter.plot_heatmap("both", False, "air_quality", np.divide(np.sum(aq_regions_species, axis=0), NUM_YEARS));
     # time series that show all years in one chart
-    time_series_method(identifier + "_emissions_time_series", "emissions", np.concatenate(emissions_time_series, axis=0));
-    time_series_method(identifier + "_SCAR_time_series", "SCAR", np.concatenate(scar_time_series, axis=0));
-    time_series_method(identifier + "_air_quality_time_series", "air_quality", np.concatenate(air_quality_time_series, axis=0));
+    print ("\nSCAR SPECIES SOURCE TIME SERIES\n");
+    print (np.concatenate(scar_time_series,axis=0));
+    print ("\nSCAR SPECIES REGIONS TIME SERIES\n");
+    print np.transpose((np.concatenate(scar_time_series,axis=0)), (1,0,2));
+    print ("\nSCAR REGIONS SPECIES TIME SERIES\n");
+    print np.transpose((np.concatenate(scar_time_series,axis=0)), (1,2,0));
+    print ("\nAIR QUALITY SPECIES SOURCES TIME SERIES\n");
+    print (np.concatenate(air_quality_time_series,axis=0));
+    print ("\nAIR QUALITY SPECIES REGIONS TIME SERIES\n");
+    print np.transpose((np.concatenate(air_quality_time_series,axis=0)), (1,0,2));
+    print ("\nAIR QUALITY REGIONS SPECIES TIME SERIES\n");
+    print np.transpose((np.concatenate(air_quality_time_series,axis=0)), (1,2,0));
+    #time_series_method(identifier + "_emissions_time_series", "emissions", np.concatenate(emissions_time_series, axis=0));
+    #time_series_method(identifier + "_SCAR_time_series", "SCAR", np.concatenate(scar_time_series, axis=0));
+    #time_series_method(identifier + "_air_quality_time_series", "air_quality", np.concatenate(air_quality_time_series, axis=0));
     
     #ENSO years -- july to june
-    plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
-    plot_method(plotter, "SCAR", process_scar, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
-    plot_method(plotter, "air_quality", process_aq, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
-    plot_method(plotter, "emissions", process_emissions, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
-    plot_method(plotter, "SCAR", process_scar, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
-    plot_method(plotter, "air_quality", process_aq, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
+    #plot_method(plotter, "emissions", process_emissions, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
+    #plot_method(plotter, "SCAR", process_scar, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
+    #plot_method(plotter, "air_quality", process_aq, emissions_data, 1997 - start_year, 7, "97-98_El_Nino");
+    #plot_method(plotter, "emissions", process_emissions, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
+    #plot_method(plotter, "SCAR", process_scar, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
+    #plot_method(plotter, "air_quality", process_aq, emissions_data, 1998 - start_year, 7, "98-99_La_Nina");
     
 # per ton carbon
 def plot_time_series_for_sources(plotter, emissions_data, process_method, metric):
@@ -272,8 +285,8 @@ def plot_time_series_for_sources(plotter, emissions_data, process_method, metric
                     if(totaled_carbon > 0):
                         all_years_chart[year, region] = totaled_region / totaled_carbon;
                     #all_sources_all_years_chart[year,region] += totaled_region;
-            plotter.plot_regions_source_time_series(sources[source] + "_per_ton_carbon", metric, all_years_chart);
-    plotter.plot_regions_source_time_series("All_sources_per_ton_carbon", metric, all_sources_all_years_chart);
+            #plotter.plot_regions_source_time_series(sources[source] + "_per_ton_carbon", metric, all_years_chart);
+    #plotter.plot_regions_source_time_series("All_sources_per_ton_carbon", metric, all_sources_all_years_chart);
             #return all_years_chart;
 
 def write_species(emissions_data, data_type, process_method, species_num, units):
