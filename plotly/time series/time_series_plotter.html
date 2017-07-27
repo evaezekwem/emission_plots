@@ -18,10 +18,10 @@
     <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">ENSO (heatmap only)<br>
     <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="All">All<br>
   <script>
-   var species_title = 'Annual Cost by Species';
-   var sources_title = 'Annual Cost by Source';
-   var regions_title = 'Annual Cost by Region'
-   var layout = {
+   const species_title = 'Annual Cost by Species';
+   const sources_title = 'Annual Cost by Source';
+   const regions_title = 'Annual Cost by Region'
+   const layout = {
         height: 730, 
         xaxis: {
             title: 'Year',
@@ -30,16 +30,16 @@
             title: 'Billion US$'
         }
     }
-    var sources = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
-    var species = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
-    var regions = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
-    var years = [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014];
-    var species_colors = ['#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#009900', '#ffff00', '#ff3300', '#800026']
-    var region_colors = ['#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#00004d', '#009900', '#ffff00', '#ff3300', '#800026', "#333300", "663300", "#999966", "#000000"]
-    var source_colors = ['#ff0066', '#660066', '#0000ff', '#009900', '#ff3300', '#800026']
-    var graphType = "Area";
-    var axis = "Species";
-    var ENSO = false;
+    const sources = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
+    const species = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
+    const regions = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
+    const years = [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014];
+    const species_colors = ['#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#009900', '#ffff00', '#ff3300', '#800026']
+    const region_colors = ['#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#00004d', '#009900', '#ffff00', '#ff3300', '#800026', "#333300", "663300", "#999966", "#000000"]
+    const source_colors = ['#ff0066', '#660066', '#0000ff', '#009900', '#ff3300', '#800026']
+    const graphType = "Area";
+    const axis = "Species";
+    const ENSO = false;
     
     function checkType(graph) {
         graphType = graph;
@@ -54,8 +54,8 @@
     }
     
     function stackedArea(traces) {
-        for(var i=1; i<traces.length; i++) {
-            for(var j=0; j<(Math.min(traces[i]['y'].length, traces[i-1]['y'].length)); j++) {
+        for(const i=1; i<traces.length; i++) {
+            for(const j=0; j<(Math.min(traces[i]['y'].length, traces[i-1]['y'].length)); j++) {
                 traces[i]['y'][j] += traces[i-1]['y'][j];
             }
         }
@@ -64,19 +64,19 @@
  
     
     function fillSpeciesVsRegions(contents) {
-        var species_data = contents.split("SPECIES");
-        var traces = []
+        const species_data = contents.split("SPECIES");
+        const traces = []
         
         //species
         for(i = 0; i < 9; i++) {
-            var this_species = species_data[i];
-            var these_regions = this_species.split("REGION");
+            const this_species = species_data[i];
+            const these_regions = this_species.split("REGION");
             for(j = 0; j < 14; j++) {
-                var region = JSON.parse(these_regions[j]);
-                var hoverinfo = 'none';
-                var fill = 'tonexty';
-                var showlegend = false;
-                var name = species[i] + " " + regions[j];
+                const region = JSON.parse(these_regions[j]);
+                const hoverinfo = 'none';
+                const fill = 'tonexty';
+                const showlegend = false;
+                const name = species[i] + " " + regions[j];
                 if(i == 0 && j == 0) {
                     fill = 'tozeroy'
                     showlegend = true;
@@ -97,19 +97,19 @@
     }
     
     function fillRegionsVsSpecies(contents) {
-        var regions_data = contents.split("REGION");
-        var traces = [];
+        const regions_data = contents.split("REGION");
+        const traces = [];
         
         //region
         for(i = 0; i < 14; i++) {
-            var this_region = regions_data[i];
-            var these_species = this_region.split("SPECIES");
+            const this_region = regions_data[i];
+            const these_species = this_region.split("SPECIES");
             for(j = 0; j < 9; j++) {
-                var species = JSON.parse(these_species[j]);
-                var hoverinfo = 'none';
-                var fill = 'tonexty';
-                var showlegend = false;
-                var name = regions[i] + " " + species[j];
+                const species = JSON.parse(these_species[j]);
+                const hoverinfo = 'none';
+                const fill = 'tonexty';
+                const showlegend = false;
+                const name = regions[i] + " " + species[j];
                 if(i == 0 && j == 0) {
                     fill = 'tozeroy'
                     showlegend = true;
@@ -130,19 +130,19 @@
     }
     
     function fillSourcesVsSpecies(contents) {
-        var traces = [];
-        var sources_data = contents.split("SOURCE");
+        const traces = [];
+        const sources_data = contents.split("SOURCE");
         
         //source
         for(i = 0; i < 6; i++) {
-            var this_source = sources_data[i];
-            var these_species = this_source.split("SPECIES");
+            const this_source = sources_data[i];
+            const these_species = this_source.split("SPECIES");
             for(j = 0; j < 9; j++) {
-                var species_data = JSON.parse(these_species[j]);
-                var hoverinfo = 'none';
-                var fill = 'tonexty';
-                var showlegend = false;
-                var name = sources[i] + " " + species[j];
+                const species_data = JSON.parse(these_species[j]);
+                const hoverinfo = 'none';
+                const fill = 'tonexty';
+                const showlegend = false;
+                const name = sources[i] + " " + species[j];
                 if(i == 0 && j == 0) {
                     fill = 'tozeroy'
                     showlegend = true;
@@ -162,18 +162,18 @@
     }
     
     function drawSpeciesVsRegions(contents) {
-        var species_data = contents.split("SPECIES");
-        var traces = [];
+        const species_data = contents.split("SPECIES");
+        const traces = [];
         
         //species
         for(i = 0; i < 9; i++) {
-            var this_species = species_data[i];
-            var these_regions = this_species.split("REGION");
+            const this_species = species_data[i];
+            const these_regions = this_species.split("REGION");
             //for(j = 0; j < 15; j++) {
-            var region = JSON.parse(these_regions[14]);
-            var hoverinfo = 'all';
-            var showlegend = true;
-            var name = "Global " + species[i];
+            const region = JSON.parse(these_regions[14]);
+            const hoverinfo = 'all';
+            const showlegend = true;
+            const name = "Global " + species[i];
             traces.push({x: years, y: region, marker: {color: species_colors[i]}, hoverinfo: hoverinfo, showlegend: showlegend, name: name});
         }
         
@@ -182,16 +182,16 @@
     }
     
     function drawSourcesVsSpecies(contents) {
-        var traces = [];
-        var source_data = contents.split("SOURCE");
+        const traces = [];
+        const source_data = contents.split("SOURCE");
         
         //source
         for(i = 0; i < 6; i++) {
-            var this_source = source_data[i];
-            var these_species = this_source.split("SPECIES");
-            var source = JSON.parse(these_species[0]);
+            const this_source = source_data[i];
+            const these_species = this_source.split("SPECIES");
+            const source = JSON.parse(these_species[0]);
             for(j = 1; j < 9; j++) {
-                var next = JSON.parse(these_species[j]);
+                const next = JSON.parse(these_species[j]);
                 for(k = 0; k < next.length; k++) {
                     source[k] += next[k];
                 }
@@ -207,17 +207,17 @@
     }
     
     window.onload = function() {
-        var fileInput = document.getElementById('fileInput');
+        const fileInput = document.getElementById('fileInput');
 
         fileInput.addEventListener('change', function(e) {
-           var file = fileInput.files[0];
-           var textType = /text.*/;
+           const file = fileInput.files[0];
+           const textType = /text.*/;
            
            if(file.type.match(textType)) {
                
-               var reader = new FileReader();
+               const reader = new FileReader();
                reader.onload = function(e) {
-                   var contents = reader.result;
+                   const contents = reader.result;
                    if(graphType == "Area") {
                        if(axis == "Species") {
                            fillSpeciesVsRegions(contents);
@@ -243,7 +243,7 @@
                    else {
                        if(ENSO) {
                            if(axis == "Regions") {
-                                   var zValues = 
+                                   const zValues =
         [
             [0, 500],
             [1.06571009e+1, 9.36803031e-1, 5.25076266e+1, 7.01939642,
@@ -284,7 +284,7 @@
                 3.75377859, 2.50697438e-1]
         ]
         
-    var spectrum = [
+    const spectrum = [
         [0, '#ffffdd'],
         [.004, '#ffeda0'],
         [.01, '#fed976'],
@@ -296,7 +296,7 @@
         [1, '#800026']
     ];
             
-    var data = [
+    const data = [
         {
             z: zValues,
             x: regions,
@@ -309,7 +309,7 @@
         }
     ];
     
-    var layout = {
+    const layout = {
         title:'SCAR Cost in El Nino 1997-1998',
         xaxis: {
             title: 'Region',
@@ -331,7 +331,7 @@
     Plotly.newPlot('myDiv', data, layout);
                            }
                            else {
-                                   var zValues = 
+                                   const zValues =
         [
             [0, 500],
             [0.00000000e+00, 4.50050648e+01, 2.24043250e+01, 1.57817909e+02,
@@ -354,7 +354,7 @@
                 3.92823065e-01, 8.31314152]
         ]
         
-    var spectrum = [
+    const spectrum = [
         [0, '#ffffdd'],
         [.004, '#ffeda0'],
         [.01, '#fed976'],
@@ -366,7 +366,7 @@
         [1, '#800026']
     ];
             
-    var data = [
+    const data = [
         {
             z: zValues,
             x: sources,
@@ -379,7 +379,7 @@
         }
     ];
     
-    var layout = {
+    const layout = {
         title:'SCAR Cost in El Nino 1997-1998',
         xaxis: {
             title: 'Region',
@@ -403,7 +403,7 @@
                        }
                        else {
                            if(axis == "Regions") {
-                                   var zValues = 
+                                   const zValues =
         [
             [0, 500],
             [1.48974136e+01, 2.23377742, 4.29386663, 1.85505740,
@@ -444,7 +444,7 @@
                 3.52274133, 4.17760129e-01]
         ]
         
-    var spectrum = [
+    const spectrum = [
         [0, '#ffffdd'],
         [.004, '#ffeda0'],
         [.01, '#fed976'],
@@ -456,7 +456,7 @@
         [1, '#800026']
     ];
             
-    var data = [
+    const data = [
         {
             z: zValues,
             x: regions,
@@ -469,7 +469,7 @@
         }
     ];
     
-    var layout = {
+    const layout = {
         title:'Average SCAR Cost 1997-2014',
         xaxis: {
             title: 'Region',
@@ -491,7 +491,7 @@
     Plotly.newPlot('myDiv', data, layout);
                            }
                            else {
-                                   var zValues = 
+                                   const zValues =
         [
             [0,500],
             [0, 4.19197398e+01, 1.41297681e+01, 9.06043506e+01,
@@ -514,7 +514,7 @@
                 1.48070923, 5.77310664]
         ]
         
-    var spectrum = [
+    const spectrum = [
         [0, '#ffffdd'],
         [.004, '#ffeda0'],
         [.01, '#fed976'],
@@ -526,7 +526,7 @@
         [1, '#800026']
     ];
             
-    var data = [
+    const data = [
         {
             z: zValues,
             x: sources,
@@ -539,7 +539,7 @@
         }
     ];
     
-    var layout = {
+    const layout = {
         title:'Average SCAR Cost 1997-2014',
         xaxis: {
             title: 'Region',
