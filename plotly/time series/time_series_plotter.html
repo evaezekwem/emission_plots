@@ -4,7 +4,6 @@
 </head>
 
 <body>
-  
     <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
     <div><input type="file" id="fileInput"></div>
     <input type="radio" name="graph" onclick="checkType(this.value)" value="Area">Area Chart<br>
@@ -18,562 +17,598 @@
     <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">ENSO (heatmap only)<br>
     <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="All">All<br>
   <script>
-   const species_title = 'Annual Cost by Species';
-   const sources_title = 'Annual Cost by Source';
-   const regions_title = 'Annual Cost by Region'
-   const layout = {
-        height: 730, 
-        xaxis: {
-            title: 'Year',
-        },
-        yaxis: {
-            title: 'Billion US$'
-        }
-    }
-    const sources = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
+    const species_title = 'Annual Cost by Species';
+    const sources_title = 'Annual Cost by Source';
+    const regions_title = 'Annual Cost by Region';
+    const layout = {
+      height: 730,
+      xaxis: {
+        title: 'Year',
+      },
+      yaxis: {title: 'Billion US$'}
+    };
+    const sources = ['SAVA', 'BORF', 'TEMF', 'DEFO', 'PEAT', 'AGRI'];
     const species = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
-    const regions = ['BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF', 'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'];
-    const years = [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014];
-    const species_colors = ['#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#009900', '#ffff00', '#ff3300', '#800026']
-    const region_colors = ['#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#00004d', '#009900', '#ffff00', '#ff3300', '#800026', "#333300", "663300", "#999966", "#000000"]
-    const source_colors = ['#ff0066', '#660066', '#0000ff', '#009900', '#ff3300', '#800026']
-    const graphType = "Area";
-    const axis = "Species";
-    const ENSO = false;
-    
+    const regions = [
+      'BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF',
+      'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'
+    ];
+    const years = [
+      1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+      2010, 2011, 2012, 2013, 2014
+    ];
+    const species_colors = [
+      '#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#009900',
+      '#ffff00', '#ff3300', '#800026'
+    ];
+    const region_colors = [
+      '#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#00004d',
+      '#009900', '#ffff00', '#ff3300', '#800026', '#333300', '663300',
+      '#999966', '#000000'
+    ];
+    const source_colors = [
+      '#ff0066', '#660066', '#0000ff', '#009900', '#ff3300', '#800026'
+    ];
+    let graphType = 'Area';
+    let axis = 'Species';
+    let ENSO = false;
+
     function checkType(graph) {
-        graphType = graph;
+      graphType = graph;
     }
-    
+
     function checkAxis(selected) {
-        axis = selected;
+      axis = selected;
     }
-    
+
     function checkENSO(selected) {
-        ENSO = (selected == "ENSO");
+      ENSO = (selected == 'ENSO');
     }
-    
-    function stackedArea(traces) {
-        for(const i=1; i<traces.length; i++) {
-            for(const j=0; j<(Math.min(traces[i]['y'].length, traces[i-1]['y'].length)); j++) {
-                traces[i]['y'][j] += traces[i-1]['y'][j];
-            }
+
+    function getStackedArea(traces) {
+      for (i = 1; i < traces.length; i++) {
+        for (j = 0;
+             j < (Math.min(traces[i]['y'].length, traces[i - 1]['y'].length));
+             j++) {
+          traces[i]['y'][j] += traces[i - 1]['y'][j];
         }
-        return traces;
+      }
+      return traces;
     }
- 
-    
+
+
     function fillSpeciesVsRegions(contents) {
-        const species_data = contents.split("SPECIES");
-        const traces = []
-        
-        //species
-        for(i = 0; i < 9; i++) {
-            const this_species = species_data[i];
-            const these_regions = this_species.split("REGION");
-            for(j = 0; j < 14; j++) {
-                const region = JSON.parse(these_regions[j]);
-                const hoverinfo = 'none';
-                const fill = 'tonexty';
-                const showlegend = false;
-                const name = species[i] + " " + regions[j];
-                if(i == 0 && j == 0) {
-                    fill = 'tozeroy'
-                    showlegend = true;
-                    name = ""
-                }
-                if(j == 13) {
-                    hoverinfo = "all"
-                    showlegend = true;
-                    name = species[i];
-                }
-                traces.push({x: years, y: region, fill: fill, marker: {color: species_colors[i]}, hoverinfo: hoverinfo, showlegend: showlegend, name: name});
+      const species_data = contents.split('SPECIES');
+      const traces = []
 
-            }
+      // species
+      for (i = 0; i < 9; i++) {
+        const this_species = species_data[i];
+        const these_regions = this_species.split('REGION');
+        for (j = 0; j < 14; j++) {
+          const region = JSON.parse(these_regions[j]);
+          let hoverinfo = 'none';
+          let fill = 'tonexty';
+          let showlegend = false;
+          let name = species[i] + ' ' + regions[j];
+          if (i == 0 && j == 0) {
+            fill = 'tozeroy'
+            showlegend = true;
+            name = ''
+          }
+          if (j == 13) {
+            hoverinfo = 'all'
+            showlegend = true;
+            name = species[i];
+          }
+          traces.push({
+            x: years,
+            y: region,
+            fill: fill,
+            marker: {color: species_colors[i]},
+            hoverinfo: hoverinfo,
+            showlegend: showlegend,
+            name: name
+          });
         }
+      }
 
-        layout.title = species_title;
-        Plotly.newPlot('myDiv', stackedArea(traces), layout);
+      layout.title = species_title;
+      Plotly.newPlot('myDiv', getStackedArea(traces), layout);
     }
-    
+
     function fillRegionsVsSpecies(contents) {
-        const regions_data = contents.split("REGION");
-        const traces = [];
-        
-        //region
-        for(i = 0; i < 14; i++) {
-            const this_region = regions_data[i];
-            const these_species = this_region.split("SPECIES");
-            for(j = 0; j < 9; j++) {
-                const species = JSON.parse(these_species[j]);
-                const hoverinfo = 'none';
-                const fill = 'tonexty';
-                const showlegend = false;
-                const name = regions[i] + " " + species[j];
-                if(i == 0 && j == 0) {
-                    fill = 'tozeroy'
-                    showlegend = true;
-                    name = ""
-                }
-                if(j == 8) {
-                    hoverinfo = "all"
-                    showlegend = true;
-                    name = regions[i];
-                }
-                traces.push({x: years, y: species, fill: fill, marker: {color: region_colors[i]}, hoverinfo: hoverinfo, showlegend: showlegend, name: name});
+      const regions_data = contents.split('REGION');
+      const traces = [];
 
-            }
+      // region
+      for (i = 0; i < 14; i++) {
+        const this_region = regions_data[i];
+        const these_species = this_region.split('SPECIES');
+        for (j = 0; j < 9; j++) {
+          const species = JSON.parse(these_species[j]);
+          let hoverinfo = 'none';
+          let fill = 'tonexty';
+          let showlegend = false;
+          let name = regions[i] + ' ' + species[j];
+          if (i == 0 && j == 0) {
+            fill = 'tozeroy'
+            showlegend = true;
+            name = ''
+          }
+          if (j == 8) {
+            hoverinfo = 'all'
+            showlegend = true;
+            name = regions[i];
+          }
+          traces.push({
+            x: years,
+            y: species,
+            fill: fill,
+            marker: {color: region_colors[i]},
+            hoverinfo: hoverinfo,
+            showlegend: showlegend,
+            name: name
+          });
         }
-        
-        layout.title = regions_title;
-        Plotly.newPlot('myDiv', stackedArea(traces), layout);
+      }
+
+      layout.title = regions_title;
+      Plotly.newPlot('myDiv', getStackedArea(traces), layout);
     }
-    
+
     function fillSourcesVsSpecies(contents) {
-        const traces = [];
-        const sources_data = contents.split("SOURCE");
-        
-        //source
-        for(i = 0; i < 6; i++) {
-            const this_source = sources_data[i];
-            const these_species = this_source.split("SPECIES");
-            for(j = 0; j < 9; j++) {
-                const species_data = JSON.parse(these_species[j]);
-                const hoverinfo = 'none';
-                const fill = 'tonexty';
-                const showlegend = false;
-                const name = sources[i] + " " + species[j];
-                if(i == 0 && j == 0) {
-                    fill = 'tozeroy'
-                    showlegend = true;
-                    name = ""
-                }
-                if(j == 8) {
-                    hoverinfo = "all"
-                    showlegend = true;
-                    name = sources[i];
-                }
-                traces.push({x: years, y: species_data, fill: fill, marker: {color: source_colors[i]}, hoverinfo: hoverinfo, showlegend: showlegend, name: name});
+      const traces = [];
+      const sources_data = contents.split('SOURCE');
 
-            }
-        }
-        layout.title = sources_title;
-        Plotly.newPlot('myDiv', stackedArea(traces), layout);
-    }
-    
-    function drawSpeciesVsRegions(contents) {
-        const species_data = contents.split("SPECIES");
-        const traces = [];
-        
-        //species
-        for(i = 0; i < 9; i++) {
-            const this_species = species_data[i];
-            const these_regions = this_species.split("REGION");
-            //for(j = 0; j < 15; j++) {
-            const region = JSON.parse(these_regions[14]);
-            const hoverinfo = 'all';
-            const showlegend = true;
-            const name = "Global " + species[i];
-            traces.push({x: years, y: region, marker: {color: species_colors[i]}, hoverinfo: hoverinfo, showlegend: showlegend, name: name});
-        }
-        
-        layout.title = species_title;
-        Plotly.newPlot('myDiv', traces, layout);
-    }
-    
-    function drawSourcesVsSpecies(contents) {
-        const traces = [];
-        const source_data = contents.split("SOURCE");
-        
-        //source
-        for(i = 0; i < 6; i++) {
-            const this_source = source_data[i];
-            const these_species = this_source.split("SPECIES");
-            const source = JSON.parse(these_species[0]);
-            for(j = 1; j < 9; j++) {
-                const next = JSON.parse(these_species[j]);
-                for(k = 0; k < next.length; k++) {
-                    source[k] += next[k];
-                }
-            }
-            hoverinfo = "all"
+      // source
+      for (i = 0; i < 6; i++) {
+        const this_source = sources_data[i];
+        const these_species = this_source.split('SPECIES');
+        for (j = 0; j < 9; j++) {
+          const species_data = JSON.parse(these_species[j]);
+          let hoverinfo = 'none';
+          let fill = 'tonexty';
+          let showlegend = false;
+          let name = sources[i] + ' ' + species[j];
+          if (i == 0 && j == 0) {
+            fill = 'tozeroy'
+            showlegend = true;
+            name = ''
+          }
+          if (j == 8) {
+            hoverinfo = 'all'
             showlegend = true;
             name = sources[i];
-            traces.push({x: years, y: source, marker: {color: source_colors[i]}, hoverinfo: hoverinfo, showlegend: showlegend, name: name});
+          }
+          traces.push({
+            x: years,
+            y: species_data,
+            fill: fill,
+            marker: {color: source_colors[i]},
+            hoverinfo: hoverinfo,
+            showlegend: showlegend,
+            name: name
+          });
         }
-        
-        layout.title = sources_title;
-        Plotly.newPlot('myDiv', traces, layout);
-    }
-    
-    window.onload = function() {
-        const fileInput = document.getElementById('fileInput');
-
-        fileInput.addEventListener('change', function(e) {
-           const file = fileInput.files[0];
-           const textType = /text.*/;
-           
-           if(file.type.match(textType)) {
-               
-               const reader = new FileReader();
-               reader.onload = function(e) {
-                   const contents = reader.result;
-                   if(graphType == "Area") {
-                       if(axis == "Species") {
-                           fillSpeciesVsRegions(contents);
-                       }
-                       if(axis == "Regions") {
-                           fillRegionsVsSpecies(contents);
-                       }
-                       if(axis == "Sources") {
-                           fillSourcesVsSpecies(contents)
-                       }
-                   }
-                   else if(graphType == "Line") {
-                       if(axis == "Species") {
-                           drawSpeciesVsRegions(contents);
-                       }
-                       if(axis == "Regions") {
-                           // TODO
-                       }
-                       if(axis == "Sources") {
-                           drawSourcesVsSpecies(contents);
-                       }
-                   }
-                   else {
-                       if(ENSO) {
-                           if(axis == "Regions") {
-                                   const zValues =
-        [
-            [0, 500],
-            [1.06571009e+1, 9.36803031e-1, 5.25076266e+1, 7.01939642,
-                6.11893169, 3.19359714e-01, 1.55708469e-2, 2.61252812e+1,
-                2.06960718, 3.28488807e+1, 1.32900971e+1, 3.70707376e+1,
-                3.72979471e+1, 4.36877517],
-            [2.29802599, 2.78807450e-1, 1.15713990e+1, 2.07116024,
-                1.55229103, 1.70970405e-1, 3.39498791e-2, 1.51064090e+1,
-                7.41170828, 8.60033447, 4.09942440, 9.96727564,
-                8.66882683, 1.25890077],
-            [1.04175435e+1, 2.37221101, 7.73646312e+1, 1.56531444e+1,
-                1.13191370e+1, 1.36769658, 2.52468766e-1, 1.31065224e+2,
-                7.16875203e+1, 4.41223520e+1, 2.94317618e+1, 7.72721384e+1,
-                3.76654865e+1, 1.14088548e+1],
-            [8.85383481e-1, 2.88434110e-1, 4.75611675, 8.00905474e-1,
-                5.94609391e-1, 1.65583728e-1, 9.29074299e-3, 9.52576565,
-                4.67101822, 3.53488962, 5.49202667, 9.81508921,
-                2.79319388, 7.75282965e-1],
-            [4.45960760, 7.78600490e-1, 2.53586588e+1, 4.91749284,
-                3.50634340, 4.47355044e-1, 6.73172585e-2, 4.21858571e+1,
-                2.23686415e+1, 1.72032049e+1, 1.17085666e+1, 2.86727401e+1,
-                1.59645281e+1, 3.52761127],
-            [1.49523486e+1, 3.60039880, 7.31289973e+1, 1.09365566e+1,
-                8.66085629, 1.94070370, 1.08174503e-1, 1.06766575e+2,
-                4.89644910e+1, 5.60566357e+1, 7.06136335e+1, 1.24765454e+2,
-                4.96120602e+1, 1.03542907e+1],
-            [1.17460002, 1.29619171e-1, 5.01954935, 1.22898882,
-                7.89941695e-1, 5.05597007e-2, 1.00900691e-2, 1.04905308e+1,
-                6.23576680, 4.29173536, 1.61072426, 4.93485949,
-                2.67719014, 8.92617842e-1],
-            [1.34133763e-1, 1.56661971, 2.79836002e+1, 1.87845111,
-                1.21511193, 1.20285755, 1.62807653e-2, 5.67060007e+1,
-                1.67903307e+1, 2.27751888, 2.99648511e+1, 9.74549548e+1,
-                1.90645026e+1, 6.42751777e-1],
-            [6.04962286e-1, 2.10585868e-1, 5.29108194, 4.97447162e-1,
-                3.85817591e-1, 2.16675760e-1, 9.70531269e-3, 6.22442124,
-                2.13460899, 3.32730085, 7.01556051, 1.05107412e+1,
-                3.75377859, 2.50697438e-1]
-        ]
-        
-    const spectrum = [
-        [0, '#ffffdd'],
-        [.004, '#ffeda0'],
-        [.01, '#fed976'],
-        [.02, '#feb24c'],
-        [.04, '#fd8d3c'],
-        [.1, '#fc4e2a'],
-        [.2, '#e31a1c'],
-        [.4, '#bd0026'],
-        [1, '#800026']
-    ];
-            
-    const data = [
-        {
-            z: zValues,
-            x: regions,
-            y: species,
-            type: 'heatmap',
-            colorscale: spectrum,
-            colorbar: {
-                title: "Billion US$"
-            }
-        }
-    ];
-    
-    const layout = {
-        title:'SCAR Cost in El Nino 1997-1998',
-        xaxis: {
-            title: 'Region',
-            side: 'top'
-        },
-        yaxis: {
-            title: 'Species'
-        },
-        width: 880,
-        height: 750,
-        margin: {
-            t: 150,
-            l: 90,
-            pad: 2
-        },
-        pad: 25
+      }
+      layout.title = sources_title;
+      Plotly.newPlot('myDiv', getStackedArea(traces), layout);
     }
 
-    Plotly.newPlot('myDiv', data, layout);
-                           }
-                           else {
-                                   const zValues =
-        [
-            [0, 500],
-            [0.00000000e+00, 4.50050648e+01, 2.24043250e+01, 1.57817909e+02,
-                5.41881609, 0.00000000e+00],
-            [2.41248952e+01, 8.62025941, 2.27691142, 2.38551521e+01,
-                3.21607430, 1.09961909e+01],
-            [2.50688712e+02, 3.91470563e+01, 1.88574722e+01, 1.34628206e+02,
-                3.38434997e-01, 7.77402889e+01],
-            [2.28656522e+01, 5.42493263, 3.89969271, 8.42687552,
-                2.54433632e-01, 3.23600315],
-            [8.29362753e+01, 1.89819811e+01, 6.81367823, 4.80195841e+01,
-                3.49245658, 2.09225495e+01],
-            [2.23048930e+02, 8.62178481e+01, 5.83178919e+01, 1.73391256e+02,
-                6.77088417, 3.27143661e+01],
-            [2.26768997e+01, 5.45657805, 9.58358649e-01, 8.45899073,
-                2.80213856e-01, 1.70573252],
-            [1.62771263e+02, 3.20648106, 8.23333721, 5.67305423e+01,
-                6.11819800e-01, 2.53445226e+01],
-            [1.10723329e+01, 5.57868123, 1.53207456, 1.35443315e+01,
-                3.92823065e-01, 8.31314152]
-        ]
-        
-    const spectrum = [
-        [0, '#ffffdd'],
-        [.004, '#ffeda0'],
-        [.01, '#fed976'],
-        [.02, '#feb24c'],
-        [.04, '#fd8d3c'],
-        [.1, '#fc4e2a'],
-        [.2, '#e31a1c'],
-        [.4, '#bd0026'],
-        [1, '#800026']
-    ];
-            
-    const data = [
-        {
-            z: zValues,
-            x: sources,
-            y: species,
-            type: 'heatmap',
-            colorscale: spectrum,
-            colorbar: {
-                title: "Billion US$"
-            }
-        }
-    ];
-    
-    const layout = {
-        title:'SCAR Cost in El Nino 1997-1998',
-        xaxis: {
-            title: 'Region',
-            side: 'top'
-        },
-        yaxis: {
-            title: 'Species'
-        },
-        width: 530,
-        height: 750,
-        margin: {
-            t: 150,
-            l: 90,
-            pad: 2
-        },
-        pad: 25
-    }
+    function drawSpeciesVsRegions(contents) {
+      const species_data = contents.split('SPECIES');
+      const traces = [];
 
-    Plotly.newPlot('myDiv', data, layout);
-                           }
-                       }
-                       else {
-                           if(axis == "Regions") {
-                                   const zValues =
-        [
-            [0, 500],
-            [1.48974136e+01, 2.23377742, 4.29386663, 1.85505740,
-                3.90821847e+01, 2.78908532e-01, 1.92575572e-02, 6.37903562,
-                8.86548046, 2.82991400e+01, 4.63129506, 1.23534030e+01,
-                3.86628439e+01, 4.16094605],
-            [3.16876639, 5.05101523e-01, 1.21714742, 7.12148751e-01,
-                8.33961808, 3.17822713e-01, 6.45157883e-02, 8.82080658,
-                1.19970268e+01, 6.39978295, 2.50013574, 3.40775429,
-                1.43003354e+01, 2.12891152],
-            [1.19809563e+01, 4.19225706, 8.65358777, 5.69672257,
-                5.75736330e+01, 2.50021170, 4.80727897e-01, 8.18166685e+01,
-                1.13803914e+02, 3.00897748e+01, 1.89888276e+01, 2.67339051e+01,
-                2.36640783e+01, 2.01328567e+01],
-            [1.16647872, 5.49438425e-01, 5.45033632e-01, 3.01681894e-01,
-                2.84276784, 2.46693687e-01, 1.72803236e-02, 6.14997805,
-                7.40231332, 2.81398522, 2.80741099, 3.48238806,
-                2.40383088, 1.26010339],
-            [5.93873370, 1.38228445, 2.76662741, 1.77366318,
-                1.83854299e+01, 7.91428709e-01, 1.27975238e-01, 2.61018955e+01,
-                3.58250965e+01, 1.29202912e+01, 6.92811543, 9.83822077,
-                1.95651584e+01, 6.26426734],
-            [2.01944373e+01, 7.27211179, 7.55011378, 3.83384734,
-                4.42037580e+01, 2.65770358, 1.96466808e-01, 6.40646407e+01,
-                7.96060322e+01, 4.57856694e+01, 3.29030598e+01, 4.38990067e+01,
-                5.02372868e+01, 1.53024559e+01],
-            [1.69060403, 2.12676881e-01, 5.45947943e-01, 4.54394087e-01,
-                4.36535912, 8.30267892e-02, 1.93818612e-02, 6.66102133,
-                1.00490542e+01, 3.50211554, 8.39255006e-01, 1.65522661,
-                2.36650463, 1.75877185],
-            [1.18710008e-01, 2.43873158, 3.28625849, 7.20051214e-01,
-                6.34485545, 2.19275525, 3.14803850e-02, 3.71607943e+01,
-                2.66360392e+01, 1.34277304, 2.10600998e+01, 3.30292666e+01,
-                1.30105656e+01, 1.30866966],
-            [8.26999431e-01, 3.77470787e-01, 5.77845851e-01, 1.73320252e-01,
-                1.97471865, 4.18410400e-01, 1.84903292e-02, 3.69085100,
-                3.38957524, 2.49064656, 4.25634405, 3.64258814,
-                3.52274133, 4.17760129e-01]
-        ]
-        
-    const spectrum = [
-        [0, '#ffffdd'],
-        [.004, '#ffeda0'],
-        [.01, '#fed976'],
-        [.02, '#feb24c'],
-        [.04, '#fd8d3c'],
-        [.1, '#fc4e2a'],
-        [.2, '#e31a1c'],
-        [.4, '#bd0026'],
-        [1, '#800026']
-    ];
-            
-    const data = [
-        {
-            z: zValues,
-            x: regions,
-            y: species,
-            type: 'heatmap',
-            colorscale: spectrum,
-            colorbar: {
-                title: "Billion US$"
-            }
-        }
-    ];
-    
-    const layout = {
-        title:'Average SCAR Cost 1997-2014',
-        xaxis: {
-            title: 'Region',
-            side: 'top'
-        },
-        yaxis: {
-            title: 'Species'
-        },
-        width: 880,
-        height: 750,
-        margin: {
-            t: 150,
-            l: 90,
-            pad: 2
-        },
-        pad: 25
-    }
-
-    Plotly.newPlot('myDiv', data, layout);
-                           }
-                           else {
-                                   const zValues =
-        [
-            [0,500],
-            [0, 4.19197398e+01, 1.41297681e+01, 9.06043506e+01,
-                1.93587515e+01, 0],
-            [2.27238923e+01, 7.93931663, 1.42039645, 1.34661166e+01,
-                1.15253031e+01, 6.80484879],
-            [2.34174625e+02, 3.57629342e+01, 1.16776644e+01, 7.51090028e+01,
-                1.21545942, 4.83684354e+01],
-            [1.85030501e+01, 4.22869024, 2.20613680, 3.93998427,
-                9.43196121e-01, 2.16832685],
-            [7.57322704e+01, 1.69512061e+01, 4.14188464, 2.59682270e+01,
-                1.26145607e+01, 1.32010389e+01],
-            [1.85045599e+02, 6.92749314e+01, 3.33896257e+01, 8.33310871e+01,
-                2.49790311e+01, 2.16863157e+01],
-            [2.16116770e+01, 5.08250181, 6.04409423e-01, 4.8563648,
-                1.00106554, 1.04732122],
-            [1.01010229e+02, 1.62066593, 4.29712807, 2.09756434e+01,
-                2.35904990, 1.84183342e+01],
-            [8.13120842, 3.81102315, 8.34792834e-01, 5.74692188,
-                1.48070923, 5.77310664]
-        ]
-        
-    const spectrum = [
-        [0, '#ffffdd'],
-        [.004, '#ffeda0'],
-        [.01, '#fed976'],
-        [.02, '#feb24c'],
-        [.04, '#fd8d3c'],
-        [.1, '#fc4e2a'],
-        [.2, '#e31a1c'],
-        [.4, '#bd0026'],
-        [1, '#800026']
-    ];
-            
-    const data = [
-        {
-            z: zValues,
-            x: sources,
-            y: species,
-            type: 'heatmap',
-            colorscale: spectrum,
-            colorbar: {
-                title: "Billion US$"
-            }
-        }
-    ];
-    
-    const layout = {
-        title:'Average SCAR Cost 1997-2014',
-        xaxis: {
-            title: 'Region',
-            side: 'top'
-        },
-        yaxis: {
-            title: 'Species'
-        },
-        width: 530,
-        height: 750,
-        margin: {
-            t: 150,
-            l: 90,
-            pad: 2
-        },
-        pad: 25
-    }
-
-    Plotly.newPlot('myDiv', data, layout);
-                           }
-                       }
-                   }
-                   
-
-               }
-               reader.readAsText(file);
-           } 
-           else {
-               alert("Not supported!")
-           }
+      // species
+      for (i = 0; i < 9; i++) {
+        const this_species = species_data[i];
+        const these_regions = this_species.split('REGION');
+        // for(j = 0; j < 15; j++) {
+        const region = JSON.parse(these_regions[14]);
+        const hoverinfo = 'all';
+        const showlegend = true;
+        const name = 'Global ' + species[i];
+        traces.push({
+          x: years,
+          y: region,
+          marker: {color: species_colors[i]},
+          hoverinfo: hoverinfo,
+          showlegend: showlegend,
+          name: name
         });
+      }
+
+      layout.title = species_title;
+      Plotly.newPlot('myDiv', traces, layout);
     }
 
+    function drawSourcesVsSpecies(contents) {
+      const traces = [];
+      const source_data = contents.split('SOURCE');
 
+      // source
+      for (i = 0; i < 6; i++) {
+        const this_source = source_data[i];
+        const these_species = this_source.split('SPECIES');
+        const source = JSON.parse(these_species[0]);
+        for (j = 1; j < 9; j++) {
+          let next = JSON.parse(these_species[j]);
+          for (k = 0; k < next.length; k++) {
+            source[k] += next[k];
+          }
+        }
+        hoverinfo = 'all'
+        showlegend = true;
+        name = sources[i];
+        traces.push({
+          x: years,
+          y: source,
+          marker: {color: source_colors[i]},
+          hoverinfo: hoverinfo,
+          showlegend: showlegend,
+          name: name
+        });
+      }
 
+      layout.title = sources_title;
+      Plotly.newPlot('myDiv', traces, layout);
+    }
+
+    window.onload = function() {
+      const fileInput = document.getElementById('fileInput');
+
+      fileInput.addEventListener('change', function(e) {
+        const file = fileInput.files[0];
+        const textType = /text.*/;
+
+        if (file.type.match(textType)) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const contents = reader.result;
+            if (graphType == 'Area') {
+              if (axis == 'Species') {
+                fillSpeciesVsRegions(contents);
+              }
+              if (axis == 'Regions') {
+                fillRegionsVsSpecies(contents);
+              }
+              if (axis == 'Sources') {
+                fillSourcesVsSpecies(contents)
+              }
+            } else if (graphType == 'Line') {
+              if (axis == 'Species') {
+                drawSpeciesVsRegions(contents);
+              }
+              if (axis == 'Regions') {
+                // TODO
+              }
+              if (axis == 'Sources') {
+                drawSourcesVsSpecies(contents);
+              }
+            } else {
+              if (ENSO) {
+                if (axis == 'Regions') {
+                  const zValues =
+                      [
+                        [0, 500],
+                        [
+                          1.06571009e+1, 9.36803031e-1, 5.25076266e+1, 7.01939642,
+                          6.11893169, 3.19359714e-01, 1.55708469e-2, 2.61252812e+1,
+                          2.06960718, 3.28488807e+1, 1.32900971e+1, 3.70707376e+1,
+                          3.72979471e+1, 4.36877517
+                        ],
+                        [
+                          2.29802599, 2.78807450e-1, 1.15713990e+1, 2.07116024,
+                          1.55229103, 1.70970405e-1, 3.39498791e-2, 1.51064090e+1,
+                          7.41170828, 8.60033447, 4.09942440, 9.96727564,
+                          8.66882683, 1.25890077
+                        ],
+                        [
+                          1.04175435e+1, 2.37221101, 7.73646312e+1, 1.56531444e+1,
+                          1.13191370e+1, 1.36769658, 2.52468766e-1, 1.31065224e+2,
+                          7.16875203e+1, 4.41223520e+1, 2.94317618e+1,
+                          7.72721384e+1, 3.76654865e+1, 1.14088548e+1
+                        ],
+                        [
+                          8.85383481e-1, 2.88434110e-1, 4.75611675, 8.00905474e-1,
+                          5.94609391e-1, 1.65583728e-1, 9.29074299e-3, 9.52576565,
+                          4.67101822, 3.53488962, 5.49202667, 9.81508921,
+                          2.79319388, 7.75282965e-1
+                        ],
+                        [
+                          4.45960760, 7.78600490e-1, 2.53586588e+1, 4.91749284,
+                          3.50634340, 4.47355044e-1, 6.73172585e-2, 4.21858571e+1,
+                          2.23686415e+1, 1.72032049e+1, 1.17085666e+1,
+                          2.86727401e+1, 1.59645281e+1, 3.52761127
+                        ],
+                        [
+                          1.49523486e+1, 3.60039880, 7.31289973e+1, 1.09365566e+1,
+                          8.66085629, 1.94070370, 1.08174503e-1, 1.06766575e+2,
+                          4.89644910e+1, 5.60566357e+1, 7.06136335e+1,
+                          1.24765454e+2, 4.96120602e+1, 1.03542907e+1
+                        ],
+                        [
+                          1.17460002, 1.29619171e-1, 5.01954935, 1.22898882,
+                          7.89941695e-1, 5.05597007e-2, 1.00900691e-2,
+                          1.04905308e+1, 6.23576680, 4.29173536, 1.61072426,
+                          4.93485949, 2.67719014, 8.92617842e-1
+                        ],
+                        [
+                          1.34133763e-1, 1.56661971, 2.79836002e+1, 1.87845111,
+                          1.21511193, 1.20285755, 1.62807653e-2, 5.67060007e+1,
+                          1.67903307e+1, 2.27751888, 2.99648511e+1, 9.74549548e+1,
+                          1.90645026e+1, 6.42751777e-1
+                        ],
+                        [
+                          6.04962286e-1, 2.10585868e-1, 5.29108194, 4.97447162e-1,
+                          3.85817591e-1, 2.16675760e-1, 9.70531269e-3, 6.22442124,
+                          2.13460899, 3.32730085, 7.01556051, 1.05107412e+1,
+                          3.75377859, 2.50697438e-1
+                        ]
+                      ]
+
+                      const spectrum = [
+                        [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
+                        [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
+                        [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
+                      ];
+
+                  const data = [{
+                    z: zValues,
+                    x: regions,
+                    y: species,
+                    type: 'heatmap',
+                    colorscale: spectrum,
+                    colorbar: {title: 'Billion US$'}
+                  }];
+
+                  const layout = {
+                    title: 'SCAR Cost in El Nino 1997-1998',
+                    xaxis: {title: 'Region', side: 'top'},
+                    yaxis: {title: 'Species'},
+                    width: 880,
+                    height: 750,
+                    margin: {t: 150, l: 90, pad: 2},
+                    pad: 25
+                  }
+
+                                 Plotly.newPlot('myDiv', data, layout);
+                } else {
+                  const zValues =
+                      [
+                        [0, 500],
+                        [
+                          0.00000000e+00, 4.50050648e+01, 2.24043250e+01,
+                          1.57817909e+02, 5.41881609, 0.00000000e+00
+                        ],
+                        [
+                          2.41248952e+01, 8.62025941, 2.27691142, 2.38551521e+01,
+                          3.21607430, 1.09961909e+01
+                        ],
+                        [
+                          2.50688712e+02, 3.91470563e+01, 1.88574722e+01,
+                          1.34628206e+02, 3.38434997e-01, 7.77402889e+01
+                        ],
+                        [
+                          2.28656522e+01, 5.42493263, 3.89969271, 8.42687552,
+                          2.54433632e-01, 3.23600315
+                        ],
+                        [
+                          8.29362753e+01, 1.89819811e+01, 6.81367823,
+                          4.80195841e+01, 3.49245658, 2.09225495e+01
+                        ],
+                        [
+                          2.23048930e+02, 8.62178481e+01, 5.83178919e+01,
+                          1.73391256e+02, 6.77088417, 3.27143661e+01
+                        ],
+                        [
+                          2.26768997e+01, 5.45657805, 9.58358649e-01, 8.45899073,
+                          2.80213856e-01, 1.70573252
+                        ],
+                        [
+                          1.62771263e+02, 3.20648106, 8.23333721, 5.67305423e+01,
+                          6.11819800e-01, 2.53445226e+01
+                        ],
+                        [
+                          1.10723329e+01, 5.57868123, 1.53207456, 1.35443315e+01,
+                          3.92823065e-01, 8.31314152
+                        ]
+                      ]
+
+                      const spectrum = [
+                        [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
+                        [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
+                        [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
+                      ];
+
+                  const data = [{
+                    z: zValues,
+                    x: sources,
+                    y: species,
+                    type: 'heatmap',
+                    colorscale: spectrum,
+                    colorbar: {title: 'Billion US$'}
+                  }];
+
+                  const layout = {
+                    title: 'SCAR Cost in El Nino 1997-1998',
+                    xaxis: {title: 'Region', side: 'top'},
+                    yaxis: {title: 'Species'},
+                    width: 530,
+                    height: 750,
+                    margin: {t: 150, l: 90, pad: 2},
+                    pad: 25
+                  }
+
+                                 Plotly.newPlot('myDiv', data, layout);
+                }
+              } else {
+                if (axis == 'Regions') {
+                  const zValues =
+                      [
+                        [0, 500],
+                        [
+                          1.48974136e+01, 2.23377742, 4.29386663, 1.85505740,
+                          3.90821847e+01, 2.78908532e-01, 1.92575572e-02,
+                          6.37903562, 8.86548046, 2.82991400e+01, 4.63129506,
+                          1.23534030e+01, 3.86628439e+01, 4.16094605
+                        ],
+                        [
+                          3.16876639, 5.05101523e-01, 1.21714742, 7.12148751e-01,
+                          8.33961808, 3.17822713e-01, 6.45157883e-02, 8.82080658,
+                          1.19970268e+01, 6.39978295, 2.50013574, 3.40775429,
+                          1.43003354e+01, 2.12891152
+                        ],
+                        [
+                          1.19809563e+01, 4.19225706, 8.65358777, 5.69672257,
+                          5.75736330e+01, 2.50021170, 4.80727897e-01,
+                          8.18166685e+01, 1.13803914e+02, 3.00897748e+01,
+                          1.89888276e+01, 2.67339051e+01, 2.36640783e+01,
+                          2.01328567e+01
+                        ],
+                        [
+                          1.16647872, 5.49438425e-01, 5.45033632e-01,
+                          3.01681894e-01, 2.84276784, 2.46693687e-01,
+                          1.72803236e-02, 6.14997805, 7.40231332, 2.81398522,
+                          2.80741099, 3.48238806, 2.40383088, 1.26010339
+                        ],
+                        [
+                          5.93873370, 1.38228445, 2.76662741, 1.77366318,
+                          1.83854299e+01, 7.91428709e-01, 1.27975238e-01,
+                          2.61018955e+01, 3.58250965e+01, 1.29202912e+01,
+                          6.92811543, 9.83822077, 1.95651584e+01, 6.26426734
+                        ],
+                        [
+                          2.01944373e+01, 7.27211179, 7.55011378, 3.83384734,
+                          4.42037580e+01, 2.65770358, 1.96466808e-01,
+                          6.40646407e+01, 7.96060322e+01, 4.57856694e+01,
+                          3.29030598e+01, 4.38990067e+01, 5.02372868e+01,
+                          1.53024559e+01
+                        ],
+                        [
+                          1.69060403, 2.12676881e-01, 5.45947943e-01,
+                          4.54394087e-01, 4.36535912, 8.30267892e-02,
+                          1.93818612e-02, 6.66102133, 1.00490542e+01, 3.50211554,
+                          8.39255006e-01, 1.65522661, 2.36650463, 1.75877185
+                        ],
+                        [
+                          1.18710008e-01, 2.43873158, 3.28625849, 7.20051214e-01,
+                          6.34485545, 2.19275525, 3.14803850e-02, 3.71607943e+01,
+                          2.66360392e+01, 1.34277304, 2.10600998e+01,
+                          3.30292666e+01, 1.30105656e+01, 1.30866966
+                        ],
+                        [
+                          8.26999431e-01, 3.77470787e-01, 5.77845851e-01,
+                          1.73320252e-01, 1.97471865, 4.18410400e-01,
+                          1.84903292e-02, 3.69085100, 3.38957524, 2.49064656,
+                          4.25634405, 3.64258814, 3.52274133, 4.17760129e-01
+                        ]
+                      ]
+
+                      const spectrum = [
+                        [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
+                        [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
+                        [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
+                      ];
+
+                  const data = [{
+                    z: zValues,
+                    x: regions,
+                    y: species,
+                    type: 'heatmap',
+                    colorscale: spectrum,
+                    colorbar: {title: 'Billion US$'}
+                  }];
+
+                  const layout = {
+                    title: 'Average SCAR Cost 1997-2014',
+                    xaxis: {title: 'Region', side: 'top'},
+                    yaxis: {title: 'Species'},
+                    width: 880,
+                    height: 750,
+                    margin: {t: 150, l: 90, pad: 2},
+                    pad: 25
+                  }
+
+                                 Plotly.newPlot('myDiv', data, layout);
+                } else {
+                  const zValues =
+                      [
+                        [0, 500],
+                        [
+                          0, 4.19197398e+01, 1.41297681e+01, 9.06043506e+01,
+                          1.93587515e+01, 0
+                        ],
+                        [
+                          2.27238923e+01, 7.93931663, 1.42039645, 1.34661166e+01,
+                          1.15253031e+01, 6.80484879
+                        ],
+                        [
+                          2.34174625e+02, 3.57629342e+01, 1.16776644e+01,
+                          7.51090028e+01, 1.21545942, 4.83684354e+01
+                        ],
+                        [
+                          1.85030501e+01, 4.22869024, 2.20613680, 3.93998427,
+                          9.43196121e-01, 2.16832685
+                        ],
+                        [
+                          7.57322704e+01, 1.69512061e+01, 4.14188464,
+                          2.59682270e+01, 1.26145607e+01, 1.32010389e+01
+                        ],
+                        [
+                          1.85045599e+02, 6.92749314e+01, 3.33896257e+01,
+                          8.33310871e+01, 2.49790311e+01, 2.16863157e+01
+                        ],
+                        [
+                          2.16116770e+01, 5.08250181, 6.04409423e-01, 4.8563648,
+                          1.00106554, 1.04732122
+                        ],
+                        [
+                          1.01010229e+02, 1.62066593, 4.29712807, 2.09756434e+01,
+                          2.35904990, 1.84183342e+01
+                        ],
+                        [
+                          8.13120842, 3.81102315, 8.34792834e-01, 5.74692188,
+                          1.48070923, 5.77310664
+                        ]
+                      ]
+
+                      const spectrum = [
+                        [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
+                        [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
+                        [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
+                      ];
+
+                  const data = [{
+                    z: zValues,
+                    x: sources,
+                    y: species,
+                    type: 'heatmap',
+                    colorscale: spectrum,
+                    colorbar: {title: 'Billion US$'}
+                  }];
+
+                  const layout = {
+                    title: 'Average SCAR Cost 1997-2014',
+                    xaxis: {title: 'Region', side: 'top'},
+                    yaxis: {title: 'Species'},
+                    width: 530,
+                    height: 750,
+                    margin: {t: 150, l: 90, pad: 2},
+                    pad: 25
+                  }
+
+                                 Plotly.newPlot('myDiv', data, layout);
+                }
+              }
+            }
+          }
+          reader.readAsText(file);
+        } else {
+          alert('Not supported!')
+        }
+      });
+    }
   </script>
 </body>
