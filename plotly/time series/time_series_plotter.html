@@ -4,18 +4,18 @@
 </head>
 
 <body>
-    <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
-    <div><input type="file" id="fileInput"></div>
-    <input type="radio" name="graph" onclick="checkType(this.value)" value="Area">Area Chart<br>
-    <input type="radio" name="graph" onclick="checkType(this.value)" value="Line">Line Chart<br>
-    <input type="radio" name="graph" onclick="checkType(this.value)" value ="Heatmap">Heatmap<br>
-    ----<br>
-    <input type="radio" name="axis" onclick="checkAxis(this.value)" value="Species">Organize by Species<br>
-    <input type="radio" name="axis" onclick="checkAxis(this.value)" value="Sources">Organize by Source<br>
-    <input type="radio" name="axis" onclick="checkAxis(this.value)" value="Regions">Organize by Region<br>
-    ----<br>
-    <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">ENSO (heatmap only)<br>
-    <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="All">All<br>
+  <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+  <div><input type="file" id="fileInput"></div>
+  <input type="radio" name="graph" onclick="checkType(this.value)" value="Area">Area Chart<br>
+  <input type="radio" name="graph" onclick="checkType(this.value)" value="Line">Line Chart<br>
+  <input type="radio" name="graph" onclick="checkType(this.value)" value ="Heatmap">Heatmap<br>
+  ----<br>
+  <input type="radio" name="axis" onclick="checkAxis(this.value)" value="Species">Organize by Species<br>
+  <input type="radio" name="axis" onclick="checkAxis(this.value)" value="Sources">Organize by Source<br>
+  <input type="radio" name="axis" onclick="checkAxis(this.value)" value="Regions">Organize by Region<br>
+  ----<br>
+  <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">ENSO (heatmap only)<br>
+  <input type="radio" name="ENSO" onclick="checkENSO(this.value)" value="All">All<br>
   <script>
     const species_title = 'Annual Cost by Species';
     const sources_title = 'Annual Cost by Source';
@@ -78,8 +78,23 @@
 
 
     function fillSpeciesVsRegions(contents) {
-      const species_data = contents.split('SPECIES');
-      const traces = []
+      const speciesList = contents.split('SPECIES');
+      const speciesMap = speciesList.map((speciesData, index) => {
+        const regionsList = speciesData.split('REGION');
+        const regionsMap = regionsList.map((regionData, index) => {
+
+        });
+        return {
+          name: species[i],
+          data: data,
+        };
+      });
+
+      // Graph lines, including both filled and unfilled lines.
+      const traces = [];
+      speciesMap.forEach((species) => {
+
+      });
 
       // species
       for (i = 0; i < 9; i++) {
