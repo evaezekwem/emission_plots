@@ -78,23 +78,10 @@
 
 
     function fillSpeciesVsRegions(contents) {
-      const speciesList = contents.split('SPECIES');
-      const speciesMap = speciesList.map((speciesData, index) => {
-        const regionsList = speciesData.split('REGION');
-        const regionsMap = regionsList.map((regionData, index) => {
 
-        });
-        return {
-          name: species[i],
-          data: data,
-        };
-      });
-
+      debugger;
       // Graph lines, including both filled and unfilled lines.
       const traces = [];
-      speciesMap.forEach((species) => {
-
-      });
 
       // species
       for (i = 0; i < 9; i++) {
@@ -280,7 +267,7 @@
         if (file.type.match(textType)) {
           const reader = new FileReader();
           reader.onload = function(e) {
-            const contents = reader.result;
+            const contents = JSON.parse(reader.result);
             if (graphType == 'Area') {
               if (axis == 'Species') {
                 fillSpeciesVsRegions(contents);
