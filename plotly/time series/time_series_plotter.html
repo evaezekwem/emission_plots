@@ -35,23 +35,56 @@
     ];
     const years = [
       1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-      2010, 2011, 2012, 2013, 2014
+      2010, 2011, 2012, 2013, 2014, 2015, 2016
     ];
-    const species_colors = [
-      '#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#009900',
-      '#ffff00', '#ff3300', '#800026'
-    ];
-    const region_colors = [
-      '#ff0066', '#660066', '#6600cc', '#0000ff', '#006666', '#00004d',
-      '#009900', '#ffff00', '#ff3300', '#800026', '#333300', '663300',
-      '#999966', '#000000'
-    ];
-    const source_colors = [
-      '#ff0066', '#660066', '#0000ff', '#009900', '#ff3300', '#800026'
-    ];
+    const COLORS = {
+      // Species
+      CO2: '#ff0066',
+      CH4: '#660066',
+      BC: '#6600cc',
+      SO2: '#0000ff',
+      CO: '#006666',
+      OC: '#009900',
+      N2O: '#ffff00',
+      NOx: '#ff3300',
+      NH3: '#800026',
+      // Regions
+      BONA: '#ff0066',
+      TENA: '#660066',
+      CEAM: '#6600cc',
+      NHSA: '#0000ff',
+      SHSA: '#006666',
+      EURO: '#00004d',
+      MIDE: '#009900',
+      NHAF: '#ffff00',
+      SHAF: '#ff3300',
+      BOAS: '#800026',
+      TEAS: '#333300',
+      SEAS: '663300',
+      EQAS: '#999966',
+      AUST: '#000000',
+      // Sources
+      SAVA: '#ff0066',
+      BORF: '#660066',
+      TEMF: '#0000ff',
+      DEFO: '#009900',
+      PEAT: '#ff3300',
+      AGRI: '#800026'
+    };
+
     let graphType = 'Area';
     let axis = 'Species';
     let ENSO = false;
+
+    const STANDARD_FILL_TRACE = {
+      showlegend: false,
+      hoverinfo: 'none',
+    };
+
+    const LAST_FILL_TRACE = {
+      showlegend: true,
+      hoverinfo: 'all',
+    };
 
     function checkType(graph) {
       graphType = graph;
@@ -76,184 +109,75 @@
       return traces;
     }
 
-
-    function fillSpeciesVsRegions(contents) {
-
-      debugger;
+    function drawStackedGraph(primaryList) {
       // Graph lines, including both filled and unfilled lines.
       const traces = [];
 
-      // species
-      for (i = 0; i < 9; i++) {
-        const this_species = species_data[i];
-        const these_regions = this_species.split('REGION');
-        for (j = 0; j < 14; j++) {
-          const region = JSON.parse(these_regions[j]);
-          let hoverinfo = 'none';
-          let fill = 'tonexty';
-          let showlegend = false;
-          let name = species[i] + ' ' + regions[j];
-          if (i == 0 && j == 0) {
-            fill = 'tozeroy'
-            showlegend = true;
-            name = ''
+      primaryList.forEach((primaryDatum, primaryIndex) => {
+        const primaryName = primaryDatum.name;
+        primaryDatum.data.forEach((subDatum, subIndex) => {
+          const subName = subDatum.name;
+          if (primaryName == 'GLOBAL' || primaryName == 'ALL' || subName == 'GLOBAL') {
+            // Don't double our results!
+            return;
           }
-          if (j == 13) {
-            hoverinfo = 'all'
-            showlegend = true;
-            name = species[i];
+          let params = STANDARD_FILL_TRACE;
+          let name = `${primaryName} ${subName}`;
+          if (subIndex == primaryDatum.data.length - 2) {
+            params = LAST_FILL_TRACE;
+            name = primaryDatum.name;
           }
-          traces.push({
+          const trace = {
             x: years,
-            y: region,
-            fill: fill,
-            marker: {color: species_colors[i]},
-            hoverinfo: hoverinfo,
-            showlegend: showlegend,
-            name: name
-          });
-        }
-      }
+            y: subDatum.data,
+            marker: {color: COLORS[primaryDatum.name]},
+            name: name,
+            fill: 'tonexty',
+          };
+          traces.push(Object.assign(trace, params));
+        });
+      });
 
       layout.title = species_title;
       Plotly.newPlot('myDiv', getStackedArea(traces), layout);
     }
 
-    function fillRegionsVsSpecies(contents) {
-      const regions_data = contents.split('REGION');
+    function drawLineGraph(primaryList) {
       const traces = [];
 
-      // region
-      for (i = 0; i < 14; i++) {
-        const this_region = regions_data[i];
-        const these_species = this_region.split('SPECIES');
-        for (j = 0; j < 9; j++) {
-          const species = JSON.parse(these_species[j]);
-          let hoverinfo = 'none';
-          let fill = 'tonexty';
-          let showlegend = false;
-          let name = regions[i] + ' ' + species[j];
-          if (i == 0 && j == 0) {
-            fill = 'tozeroy'
-            showlegend = true;
-            name = ''
-          }
-          if (j == 8) {
-            hoverinfo = 'all'
-            showlegend = true;
-            name = regions[i];
-          }
-          traces.push({
-            x: years,
-            y: species,
-            fill: fill,
-            marker: {color: region_colors[i]},
-            hoverinfo: hoverinfo,
-            showlegend: showlegend,
-            name: name
-          });
+      primaryList.forEach((primaryData) => {
+        if (primaryData.name == 'GLOBAL' || primaryData.name == 'ALL') {
+          // Don't double our results!
+          return;
         }
-      }
+        // Vertically sum each sub-matrix into a single object.
+        // Result contains 'Global' data for each subject being tracked (e.g. "All CO2 emissions").
+        const summedDataList = primaryData.data.reduce((summedData, nextData) => {
+          if (nextData.name == 'GLOBAL' || nextData.name == 'ALL') {
+            return summedData;
+          }
 
+          // Add each data point in the next species/source/region to the running sum.
+          const incrementalSum = summedData.data.map((sum, index) => sum + nextData.data[index]);
+          return {
+            name: 'ALL',
+            data: incrementalSum,
+          }
+        });
+
+        // Add a line representing all data for this species/source/region.
+        traces.push({
+          x: years,
+          y: summedDataList.data,
+          marker: {color: COLORS[primaryData.name]},
+          hoverinfo: 'all',
+          showlegend: true,
+          name: `All ${primaryData.name} emissions`
+        });
+      });
+
+      // Finalize the plot.
       layout.title = regions_title;
-      Plotly.newPlot('myDiv', getStackedArea(traces), layout);
-    }
-
-    function fillSourcesVsSpecies(contents) {
-      const traces = [];
-      const sources_data = contents.split('SOURCE');
-
-      // source
-      for (i = 0; i < 6; i++) {
-        const this_source = sources_data[i];
-        const these_species = this_source.split('SPECIES');
-        for (j = 0; j < 9; j++) {
-          const species_data = JSON.parse(these_species[j]);
-          let hoverinfo = 'none';
-          let fill = 'tonexty';
-          let showlegend = false;
-          let name = sources[i] + ' ' + species[j];
-          if (i == 0 && j == 0) {
-            fill = 'tozeroy'
-            showlegend = true;
-            name = ''
-          }
-          if (j == 8) {
-            hoverinfo = 'all'
-            showlegend = true;
-            name = sources[i];
-          }
-          traces.push({
-            x: years,
-            y: species_data,
-            fill: fill,
-            marker: {color: source_colors[i]},
-            hoverinfo: hoverinfo,
-            showlegend: showlegend,
-            name: name
-          });
-        }
-      }
-      layout.title = sources_title;
-      Plotly.newPlot('myDiv', getStackedArea(traces), layout);
-    }
-
-    function drawSpeciesVsRegions(contents) {
-      const species_data = contents.split('SPECIES');
-      const traces = [];
-
-      // species
-      for (i = 0; i < 9; i++) {
-        const this_species = species_data[i];
-        const these_regions = this_species.split('REGION');
-        // for(j = 0; j < 15; j++) {
-        const region = JSON.parse(these_regions[14]);
-        const hoverinfo = 'all';
-        const showlegend = true;
-        const name = 'Global ' + species[i];
-        traces.push({
-          x: years,
-          y: region,
-          marker: {color: species_colors[i]},
-          hoverinfo: hoverinfo,
-          showlegend: showlegend,
-          name: name
-        });
-      }
-
-      layout.title = species_title;
-      Plotly.newPlot('myDiv', traces, layout);
-    }
-
-    function drawSourcesVsSpecies(contents) {
-      const traces = [];
-      const source_data = contents.split('SOURCE');
-
-      // source
-      for (i = 0; i < 6; i++) {
-        const this_source = source_data[i];
-        const these_species = this_source.split('SPECIES');
-        const source = JSON.parse(these_species[0]);
-        for (j = 1; j < 9; j++) {
-          let next = JSON.parse(these_species[j]);
-          for (k = 0; k < next.length; k++) {
-            source[k] += next[k];
-          }
-        }
-        hoverinfo = 'all'
-        showlegend = true;
-        name = sources[i];
-        traces.push({
-          x: years,
-          y: source,
-          marker: {color: source_colors[i]},
-          hoverinfo: hoverinfo,
-          showlegend: showlegend,
-          name: name
-        });
-      }
-
-      layout.title = sources_title;
       Plotly.newPlot('myDiv', traces, layout);
     }
 
@@ -267,27 +191,11 @@
         if (file.type.match(textType)) {
           const reader = new FileReader();
           reader.onload = function(e) {
-            const contents = JSON.parse(reader.result);
+            const data = JSON.parse(reader.result).data;
             if (graphType == 'Area') {
-              if (axis == 'Species') {
-                fillSpeciesVsRegions(contents);
-              }
-              if (axis == 'Regions') {
-                fillRegionsVsSpecies(contents);
-              }
-              if (axis == 'Sources') {
-                fillSourcesVsSpecies(contents)
-              }
+              drawStackedGraph(data);
             } else if (graphType == 'Line') {
-              if (axis == 'Species') {
-                drawSpeciesVsRegions(contents);
-              }
-              if (axis == 'Regions') {
-                // TODO
-              }
-              if (axis == 'Sources') {
-                drawSourcesVsSpecies(contents);
-              }
+              drawLineGraph(data);
             } else {
               if (ENSO) {
                 if (axis == 'Regions') {
