@@ -64,6 +64,7 @@ const COLOR_SPECTRUM = [
 const STANDARD_FILL_TRACE = {
   showlegend: false,
   hoverinfo: 'none',
+  visible: false,
 };
 
 const LAST_FILL_TRACE = {

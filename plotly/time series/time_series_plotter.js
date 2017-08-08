@@ -41,8 +41,8 @@ function checkENSO(ensoFlag) {
  */
 function getStackedArea(traces) {
   for (i = 1; i < traces.length; i++) {
-    traces[i].y = traces[i].y.map((yearData, yearNumber) =>
-        yearData + traces[i - 1].y[yearNumber]);
+    traces[i].y = traces[i].y.map(
+        (yearData, yearNumber) => yearData + traces[i - 1].y[yearNumber]);
   }
   return traces;
 }
@@ -60,7 +60,8 @@ function drawStackedGraph(primaryList, axis) {
     const primaryName = primaryDatum.name;
     primaryDatum.data.forEach((subDatum, subIndex) => {
       const subName = subDatum.name;
-      if (primaryName == 'GLOBAL' || primaryName == 'ALL' || subName == 'GLOBAL') {
+      if (primaryName == 'GLOBAL' || primaryName == 'ALL' ||
+          subName == 'GLOBAL') {
         // Don't double our results!
         return;
       }
@@ -83,7 +84,7 @@ function drawStackedGraph(primaryList, axis) {
 
   // Finalize the plot.
   const layout =
-      Object.assign(COMMON_LAYOUT, { title: `Annual cost by ${axis}` });
+      Object.assign(COMMON_LAYOUT, {title: `Annual cost by ${axis}`});
   Plotly.newPlot('myDiv', getStackedArea(traces), layout);
 }
 
@@ -108,8 +109,8 @@ function drawLineGraph(primaryList, axis) {
       }
 
       // Add each data point in the next species/source/region to running sum.
-      const incrementalSum = summedData.data.map((sum, index) =>
-          sum + nextData.data[index]);
+      const incrementalSum =
+          summedData.data.map((sum, index) => sum + nextData.data[index]);
       return {
         name: 'ALL',
         data: incrementalSum,
@@ -129,7 +130,7 @@ function drawLineGraph(primaryList, axis) {
 
   // Finalize the plot.
   const layout =
-      Object.assign(COMMON_LAYOUT, { title: `Annual cost by ${axis}` });
+      Object.assign(COMMON_LAYOUT, {title: `Annual cost by ${axis}`});
   Plotly.newPlot('myDiv', traces, layout);
 }
 
@@ -156,9 +157,11 @@ function drawHeatMap(fileData, axis) {
   if (axis == 'Regions' || axis == 'Species') {
     data[0].x = REGIONS;
     layout.width = 880;
+    layout.xaxis.title = 'Region';
   } else if (axis == 'Sources') {
     data[0].x = SOURCES;
     layout.width = 530;
+    layout.xaxis.title = 'Sources';
   }
 
   if (ENSO) {
