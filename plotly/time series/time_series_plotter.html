@@ -29,6 +29,7 @@
     };
     const sources = ['SAVA', 'BORF', 'TEMF', 'DEFO', 'PEAT', 'AGRI'];
     const species = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
+    const speciesWithLegend = ['0/500', 'CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
     const regions = [
       'BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF',
       'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'
@@ -71,6 +72,17 @@
       PEAT: '#ff3300',
       AGRI: '#800026'
     };
+    const COLOR_SPECTRUM = [
+      [0, '#ffffdd'],
+      [.004, '#ffeda0'],
+      [.01, '#fed976'],
+      [.02, '#feb24c'],
+      [.04, '#fd8d3c'],
+      [.1, '#fc4e2a'],
+      [.2, '#e31a1c'],
+      [.4, '#bd0026'],
+      [1, '#800026'],
+    ];
 
     let graphType = 'Area';
     let axis = 'Species';
@@ -100,16 +112,15 @@
 
     function getStackedArea(traces) {
       for (i = 1; i < traces.length; i++) {
-        for (j = 0;
-             j < (Math.min(traces[i]['y'].length, traces[i - 1]['y'].length));
-             j++) {
-          traces[i]['y'][j] += traces[i - 1]['y'][j];
-        }
+        let currTraceYears = traces[i].y;
+        const previousTraceYears = traces[i - 1].y;
+        traces[i].y =
+            traces[i].y.map((yearData, yearNumber) => yearData + traces[i - 1].y[yearNumber]);
       }
       return traces;
     }
 
-    function drawStackedGraph(primaryList) {
+    function drawStackedGraph(primaryList, axis) {
       // Graph lines, including both filled and unfilled lines.
       const traces = [];
 
@@ -138,11 +149,11 @@
         });
       });
 
-      layout.title = species_title;
+      layout.title = `Annual cost by ${axis}`;
       Plotly.newPlot('myDiv', getStackedArea(traces), layout);
     }
 
-    function drawLineGraph(primaryList) {
+    function drawLineGraph(primaryList, axis) {
       const traces = [];
 
       primaryList.forEach((primaryData) => {
@@ -177,8 +188,39 @@
       });
 
       // Finalize the plot.
-      layout.title = regions_title;
+      layout.title = `Annual cost by ${axis}`;
       Plotly.newPlot('myDiv', traces, layout);
+    }
+
+    function drawHeatMap(fileData, axis) {
+      const data = [{
+        z: fileData,
+        y: speciesWithLegend,
+        type: 'heatmap',
+        colorscale: COLOR_SPECTRUM,
+        colorbar: {title: 'Billion US$'}
+      }];
+      const layout = {
+        xaxis: {title: axis, side: 'top'},
+        yaxis: {title: 'Species'},
+        height: 750,
+        margin: {t: 150, l: 90, pad: 2},
+        pad: 25
+      };
+      if (axis == 'Regions' || axis == 'Species') {
+        data[0].x = regions;
+        layout.width = 880;
+      } else if (axis == 'Sources') {
+        data[0].x = sources;
+        layout.width = 530;
+      }
+
+      if (ENSO) {
+        layout.title = 'SCAR Cost in El Nino 1997-1998';
+      } else {
+        layout.title = 'Average SCAR Cost 1997-2014';
+      }
+      Plotly.newPlot('myDiv', data, layout);
     }
 
     window.onload = function() {
@@ -193,123 +235,11 @@
           reader.onload = function(e) {
             const fileData = JSON.parse(reader.result);
             if (graphType == 'Area') {
-              drawStackedGraph(fileData.data);
+              drawStackedGraph(fileData.data, axis);
             } else if (graphType == 'Line') {
-              drawLineGraph(fileData.data);
+              drawLineGraph(fileData.data, axis);
             } else {
-              if (ENSO) {
-                if (axis == 'Regions') {
-                  const spectrum = [
-                    [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
-                    [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
-                    [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
-                  ];
-
-                  const data = [{
-                    z: fileData,
-                    x: regions,
-                    y: species,
-                    type: 'heatmap',
-                    colorscale: spectrum,
-                    colorbar: {title: 'Billion US$'}
-                  }];
-
-                  const layout = {
-                    title: 'SCAR Cost in El Nino 1997-1998',
-                    xaxis: {title: 'Region', side: 'top'},
-                    yaxis: {title: 'Species'},
-                    width: 880,
-                    height: 750,
-                    margin: {t: 150, l: 90, pad: 2},
-                    pad: 25
-                  }
-
-                  Plotly.newPlot('myDiv', data, layout);
-                } else {
-                  const spectrum = [
-                    [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
-                    [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
-                    [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
-                  ];
-
-                  const data = [{
-                    z: fileData,
-                    x: sources,
-                    y: species,
-                    type: 'heatmap',
-                    colorscale: spectrum,
-                    colorbar: {title: 'Billion US$'}
-                  }];
-
-                  const layout = {
-                    title: 'SCAR Cost in El Nino 1997-1998',
-                    xaxis: {title: 'Region', side: 'top'},
-                    yaxis: {title: 'Species'},
-                    width: 530,
-                    height: 750,
-                    margin: {t: 150, l: 90, pad: 2},
-                    pad: 25
-                  }
-
-                  Plotly.newPlot('myDiv', data, layout);
-                }
-              } else {
-                if (axis == 'Regions') {
-                  const spectrum = [
-                    [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
-                    [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
-                    [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
-                  ];
-
-                  const data = [{
-                    z: fileData,
-                    x: regions,
-                    y: species,
-                    type: 'heatmap',
-                    colorscale: spectrum,
-                    colorbar: {title: 'Billion US$'}
-                  }];
-
-                  const layout = {
-                    title: 'Average SCAR Cost 1997-2014',
-                    xaxis: {title: 'Region', side: 'top'},
-                    yaxis: {title: 'Species'},
-                    width: 880,
-                    height: 750,
-                    margin: {t: 150, l: 90, pad: 2},
-                    pad: 25
-                  }
-
-                                 Plotly.newPlot('myDiv', data, layout);
-                } else {
-                  const spectrum = [
-                    [0, '#ffffdd'], [.004, '#ffeda0'], [.01, '#fed976'],
-                    [.02, '#feb24c'], [.04, '#fd8d3c'], [.1, '#fc4e2a'],
-                    [.2, '#e31a1c'], [.4, '#bd0026'], [1, '#800026']
-                  ];
-
-                  const data = [{
-                    z: fileData,
-                    x: sources,
-                    y: species,
-                    type: 'heatmap',
-                    colorscale: spectrum,
-                    colorbar: {title: 'Billion US$'}
-                  }];
-
-                  const layout = {
-                    title: 'Average SCAR Cost 1997-2014',
-                    xaxis: {title: 'Region', side: 'top'},
-                    yaxis: {title: 'Species'},
-                    width: 530,
-                    height: 750,
-                    margin: {t: 150, l: 90, pad: 2},
-                    pad: 25
-                  }
-
-                  Plotly.newPlot('myDiv', data, layout);
-                }
-              }
+              drawHeatMap(fileData, axis);
             }
           }
           reader.readAsText(file);
