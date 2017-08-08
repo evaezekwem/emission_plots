@@ -136,41 +136,47 @@
 
         <div class="check"></div>
       </li>
-      <li class="line">
-      </li>
-      <li>
-        <input id="species" type="radio" name="axis" onclick="checkAxis(this.value)" value="Species">
-        <label for="species">Organize by Species</label>
+      <div id="axis-flag" style="display: none">
+        <li class="line">
+        </li>
+        <li>
+          <input id="species" type="radio" name="axis" onclick="checkAxis(this.value)" value="Species">
+          <label for="species">Organize by Species</label>
 
-        <div class="check"></div>
-      </li>
-      <li>
-        <input id="source" type="radio" name="axis" onclick="checkAxis(this.value)" value="Sources">
-        <label for="source">Organize by Source</label>
+          <div class="check"></div>
+        </li>
+        <li>
+          <input id="source" type="radio" name="axis" onclick="checkAxis(this.value)" value="Sources">
+          <label for="source">Organize by Source</label>
 
-        <div class="check"></div>
-      </li>
-      <li>
-        <input id="region" type="radio" name="axis" onclick="checkAxis(this.value)" value="Regions">
-        <label for="region">Organize by Region</label>
+          <div class="check"></div>
+        </li>
+        <li>
+          <input id="region" type="radio" name="axis" onclick="checkAxis(this.value)" value="Regions">
+          <label for="region">Organize by Region</label>
 
-        <div class="check"></div>
-      </li>
-      <li class="line">
-      </li>
-      <li>
-        <input id="ENSO" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
-        <label for="ENSO">ENSO</label>
+          <div class="check"></div>
+        </li>
+      </div>
+      <div id="ENSO-flag" style="display: none">
+        <li class="line">
+        </li>
+        <li>
+          <input id="ENSO" style="display: none" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
+          <label for="ENSO">ENSO</label>
 
-        <div class="check"></div>
-      </li>
-      <li>
-        <input id="all" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
-        <label for="all">All</label>
+          <div class="check"></div>
+        </li>
+        <li>
+          <input id="all" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
+          <label for="all">All</label>
 
-        <div class="check"></div>
-      </li>
+          <div class="check"></div>
+        </li>
+      </div>
     </ul>
-    <div><input type="file" class="file-input" id="fileInput"></div>
+    <div id="file-input" style="display: none">
+      <input type="file" class="file-input" id="fileInput">
+    </div>
   </container>
 </body>
