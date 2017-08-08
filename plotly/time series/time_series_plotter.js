@@ -1,23 +1,20 @@
-const species_title = 'Annual Cost by Species';
-const sources_title = 'Annual Cost by Source';
-const regions_title = 'Annual Cost by Region';
-const layout = {
+const COMMON_LAYOUT = {
   height: 730,
   xaxis: {
     title: 'Year',
   },
-  yaxis: {title: 'Billion US$'}
+  yaxis: {title: 'Billion US$'},
 };
-const sources = ['SAVA', 'BORF', 'TEMF', 'DEFO', 'PEAT', 'AGRI'];
-const species = ['CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
-const speciesWithLegend = ['0/500', 'CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3'];
-const regions = [
+const SOURCES = ['SAVA', 'BORF', 'TEMF', 'DEFO', 'PEAT', 'AGRI',];
+const REGIONS = [
   'BONA', 'TENA', 'CEAM', 'NHSA', 'SHSA', 'EURO', 'MIDE', 'NHAF', 'SHAF',
-  'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST'
+  'BOAS', 'TEAS', 'SEAS', 'EQAS', 'AUST',
 ];
-const years = [
+const SPECIES_WITH_LEGEND =
+    ['0/500', 'CO2', 'CH4', 'BC', 'SO2', 'CO', 'OC', 'N2O', 'NOx', 'NH3',];
+const YEARS = [
   1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-  2010, 2011, 2012, 2013, 2014, 2015, 2016
+  2010, 2011, 2012, 2013, 2014, 2015, 2016,
 ];
 const COLORS = {
   // Species
@@ -51,7 +48,7 @@ const COLORS = {
   TEMF: '#0000ff',
   DEFO: '#009900',
   PEAT: '#ff3300',
-  AGRI: '#800026'
+  AGRI: '#800026',
 };
 const COLOR_SPECTRUM = [
   [0, '#ffffdd'],
@@ -65,10 +62,6 @@ const COLOR_SPECTRUM = [
   [1, '#800026'],
 ];
 
-let graphType = 'Area';
-let axis = 'Species';
-let ENSO = false;
-
 const STANDARD_FILL_TRACE = {
   showlegend: false,
   hoverinfo: 'none',
@@ -78,6 +71,10 @@ const LAST_FILL_TRACE = {
   showlegend: true,
   hoverinfo: 'all',
 };
+
+let graphType = 'Area';
+let axis = 'Species';
+let ENSO = false;
 
 /**
  * Sets the graph type to the selected type.
@@ -141,7 +138,7 @@ function drawStackedGraph(primaryList, axis) {
         name = primaryDatum.name;
       }
       const trace = {
-        x: years,
+        x: YEARS,
         y: subDatum.data,
         marker: {color: COLORS[primaryDatum.name]},
         name: name,
@@ -151,7 +148,9 @@ function drawStackedGraph(primaryList, axis) {
     });
   });
 
-  layout.title = `Annual cost by ${axis}`;
+  // Finalize the plot.
+  const layout =
+      Object.assign(COMMON_LAYOUT, { title: `Annual cost by ${axis}` });
   Plotly.newPlot('myDiv', getStackedArea(traces), layout);
 }
 
@@ -186,7 +185,7 @@ function drawLineGraph(primaryList, axis) {
 
     // Add a line representing all data for this species/source/region.
     traces.push({
-      x: years,
+      x: YEARS,
       y: summedDataList.data,
       marker: {color: COLORS[primaryData.name]},
       hoverinfo: 'all',
@@ -196,7 +195,8 @@ function drawLineGraph(primaryList, axis) {
   });
 
   // Finalize the plot.
-  layout.title = `Annual cost by ${axis}`;
+  const layout =
+      Object.assign(COMMON_LAYOUT, { title: `Annual cost by ${axis}` });
   Plotly.newPlot('myDiv', traces, layout);
 }
 
@@ -208,7 +208,7 @@ function drawLineGraph(primaryList, axis) {
 function drawHeatMap(fileData, axis) {
   const data = [{
     z: fileData,
-    y: speciesWithLegend,
+    y: SPECIES_WITH_LEGEND,
     type: 'heatmap',
     colorscale: COLOR_SPECTRUM,
     colorbar: {title: 'Billion US$'}
@@ -221,10 +221,10 @@ function drawHeatMap(fileData, axis) {
     pad: 25
   };
   if (axis == 'Regions' || axis == 'Species') {
-    data[0].x = regions;
+    data[0].x = REGIONS;
     layout.width = 880;
   } else if (axis == 'Sources') {
-    data[0].x = sources;
+    data[0].x = SOURCES;
     layout.width = 530;
   }
 
