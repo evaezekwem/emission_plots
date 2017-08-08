@@ -105,64 +105,67 @@
 
   .line {
     border-bottom: 1px solid #333;
+    height: 0px;
   }
 </style>
 
 <body>
-  <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
-  <ul>
-    <li>
-      <input id="area" type="radio" name="graph" onclick="checkType(this.value)" value="Area">
-      <label for="area">Area Chart</label>
+  <container class="container">
+    <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+    <ul>
+      <li>
+        <input id="area" type="radio" name="graph" onclick="checkType(this.value)" value="Area">
+        <label for="area">Area Chart</label>
 
-      <div class="check"></div>
-    </li>
-    <li>
-      <input id="line" type="radio" name="graph" onclick="checkType(this.value)" value="Line">
-      <label for="line">Line Chart</label>
+        <div class="check"></div>
+      </li>
+      <li>
+        <input id="line" type="radio" name="graph" onclick="checkType(this.value)" value="Line">
+        <label for="line">Line Chart</label>
 
-      <div class="check"></div>
-    </li>
-    <li>
-      <input id="heat" type="radio" name="graph" onclick="checkType(this.value)" value="Heatmap">
-      <label for="heat">Heatmap</label>
+        <div class="check"></div>
+      </li>
+      <li>
+        <input id="heat" type="radio" name="graph" onclick="checkType(this.value)" value="Heatmap">
+        <label for="heat">Heatmap</label>
 
-      <div class="check"></div>
-    </li>
-    <li class="line">
-    </li>
-    <li>
-      <input id="species" type="radio" name="axis" onclick="checkAxis(this.value)" value="Species">
-      <label for="species">Organize by Species</label>
+        <div class="check"></div>
+      </li>
+      <li class="line">
+      </li>
+      <li>
+        <input id="species" type="radio" name="axis" onclick="checkAxis(this.value)" value="Species">
+        <label for="species">Organize by Species</label>
 
-      <div class="check"></div>
-    </li>
-    <li>
-      <input id="source" type="radio" name="axis" onclick="checkAxis(this.value)" value="Sources">
-      <label for="source">Organize by Source</label>
+        <div class="check"></div>
+      </li>
+      <li>
+        <input id="source" type="radio" name="axis" onclick="checkAxis(this.value)" value="Sources">
+        <label for="source">Organize by Source</label>
 
-      <div class="check"></div>
-    </li>
-    <li>
-      <input id="region" type="radio" name="axis" onclick="checkAxis(this.value)" value="Regions">
-      <label for="region">Organize by Region</label>
+        <div class="check"></div>
+      </li>
+      <li>
+        <input id="region" type="radio" name="axis" onclick="checkAxis(this.value)" value="Regions">
+        <label for="region">Organize by Region</label>
 
-      <div class="check"></div>
-    </li>
-    <li class="line">
-    </li>
-    <li>
-      <input id="ENSO" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
-      <label for="ENSO">ENSO</label>
+        <div class="check"></div>
+      </li>
+      <li class="line">
+      </li>
+      <li>
+        <input id="ENSO" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
+        <label for="ENSO">ENSO</label>
 
-      <div class="check"></div>
-    </li>
-    <li>
-      <input id="all" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
-      <label for="all">All</label>
+        <div class="check"></div>
+      </li>
+      <li>
+        <input id="all" type="radio" name="ENSO" onclick="checkENSO(this.value)" value="ENSO">
+        <label for="all">All</label>
 
-      <div class="check"></div>
-    </li>
-  </ul>
-  <div><input type="file" id="fileInput"></div>
+        <div class="check"></div>
+      </li>
+    </ul>
+    <div><input type="file" id="fileInput"></div>
+  </container>
 </body>
