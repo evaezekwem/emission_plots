@@ -9,9 +9,6 @@ let ENSO = false;
 function checkType(graph) {
   graphType = graph;
   document.getElementById('axis-flag').style.display = 'block';
-  if (graphType == 'Heatmap') {
-    document.getElementById('ENSO').style.display = 'block';
-  }
 }
 
 /**
@@ -20,7 +17,11 @@ function checkType(graph) {
  */
 function checkAxis(selectedAxis) {
   axis = selectedAxis;
-  document.getElementById('ENSO-flag').style.display = 'block';
+  if (graphType == 'Heatmap') {
+    document.getElementById('ENSO-flag').style.display = 'block';
+  } else {
+    document.getElementById('file-input').style.display = 'block';
+  }
 }
 
 /**
